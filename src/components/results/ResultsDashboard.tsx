@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   const [isPaid, setIsPaid] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
+  const searchParams = useSearchParams();
 
   const {
     paidStep,
@@ -51,6 +53,17 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
 
   // Verifica acesso pago
   useEffect(() => {
+    // Modo teste: ?teste=trilha2026 bypassa o paywall
+    if (searchParams.get('teste') === 'trilha2026') {
+      sessionStorage.setItem('raiox_test_mode', 'true');
+      setIsPaid(true);
+      return;
+    }
+    if (sessionStorage.getItem('raiox_test_mode') === 'true') {
+      setIsPaid(true);
+      return;
+    }
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('acesso') === 'liberado') {
       setIsPaid(true);
@@ -59,7 +72,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     } else if (localStorage.getItem('raiox_paid') === 'true') {
       setIsPaid(true);
     }
-  }, []);
+  }, [searchParams]);
 
   function handleUnlock() {
     setIsPaid(true);
