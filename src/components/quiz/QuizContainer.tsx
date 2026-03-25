@@ -23,9 +23,9 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
   const isLastStep = currentStep === totalSteps - 1;
   const isFirstStep = currentStep === 0;
 
-  // Validação: campos de moeda devem ter valor > 0, percentuais são sempre válidos
+  // Validação: campos de moeda devem ter valor > 0, percentuais e opcionais são sempre válidos
   const currentValue = input[currentQuestion.id];
-  const isValid = currentQuestion.type === 'percent' || currentValue > 0;
+  const isValid = currentQuestion.type === 'percent' || currentQuestion.optional || currentValue > 0;
 
   function handleNext() {
     if (!isValid) return;

@@ -279,13 +279,15 @@ export async function generateSpreadsheet(
   const fat = input.faturamento;
   const custosProduto   = fat * (input.custoProductPercent / 100);
   const custosTaxas     = fat * (input.taxaPercent / 100);
-  const totalCustos     = input.custosFixos + custosProduto + custosTaxas + input.proLabore;
+  const frete           = input.gastosFreteEntrega ?? 0;
+  const totalCustos     = input.custosFixos + custosProduto + custosTaxas + input.proLabore + frete;
 
   const custoRows: Array<[string, number, string]> = [
     ['Custos Fixos',           input.custosFixos,         'Aluguel, funcionários, luz...'],
     ['Custo de Produtos',      custosProduto,              `${input.custoProductPercent}% do faturamento`],
     ['Taxas (cartão/mkt)',     custosTaxas,                `${input.taxaPercent}% do faturamento`],
     ['Pró-labore (salário)',   input.proLabore,            'Retirada do dono'],
+    ['Frete e Entrega',        frete,                      'Correios, motoboy, transportadoras'],
   ];
 
   custoRows.forEach(([label, valor, detalhe], i) => {
@@ -387,6 +389,7 @@ export async function generateSpreadsheet(
     ['Custo do Produto (%)',       `${input.custoProductPercent}%`,       '% do faturamento gasto com mercadoria'],
     ['Taxas (cartão/marketplace)', `${input.taxaPercent}%`,              '% pago em taxas sobre as vendas'],
     ['Pró-labore Desejado',        brl(input.proLabore),                 'Salário que o dono quer retirar'],
+    ['Frete e Entrega',            brl(input.gastosFreteEntrega ?? 0),   'Correios, motoboy, transportadoras'],
   ];
 
   inputRows.forEach(([campo, valor, desc], i) => {

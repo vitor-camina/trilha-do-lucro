@@ -30,6 +30,11 @@ export function QuestionScreen({ question, value, onChange, direction }: Questio
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-3 leading-tight">
         {question.question}
       </h2>
+      {question.optional && (
+        <span className="inline-block text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full mb-2">
+          opcional — pode deixar em zero
+        </span>
+      )}
 
       {/* Subtexto explicativo */}
       <p className="text-base text-gray-500 text-center mb-8 max-w-sm leading-relaxed">

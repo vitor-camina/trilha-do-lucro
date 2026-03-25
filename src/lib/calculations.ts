@@ -4,10 +4,10 @@ import type { DiagnosticInput, DiagnosticResult } from '@/types';
  * Calcula o lucro real: o que sobra depois de pagar tudo (incluindo o salário do dono).
  */
 export function calculateLucroReal(input: DiagnosticInput): number {
-  const { faturamento, custosFixos, custoProductPercent, taxaPercent, proLabore } = input;
+  const { faturamento, custosFixos, custoProductPercent, taxaPercent, proLabore, gastosFreteEntrega = 0 } = input;
   const custosProduto = faturamento * (custoProductPercent / 100);
   const taxas = faturamento * (taxaPercent / 100);
-  return faturamento - custosFixos - custosProduto - taxas - proLabore;
+  return faturamento - custosFixos - custosProduto - taxas - proLabore - gastosFreteEntrega;
 }
 
 /**
@@ -24,20 +24,20 @@ export function calculateMargemLiquida(input: DiagnosticInput): number {
  * (sem contar o salário do dono).
  */
 export function calculatePontoEquilibrio(input: DiagnosticInput): number {
-  const { custosFixos, custoProductPercent, taxaPercent } = input;
+  const { custosFixos, custoProductPercent, taxaPercent, gastosFreteEntrega = 0 } = input;
   const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100);
   if (margemContribuicao <= 0) return Infinity;
-  return custosFixos / margemContribuicao;
+  return (custosFixos + gastosFreteEntrega) / margemContribuicao;
 }
 
 /**
  * Calcula o faturamento necessário para cobrir tudo + salário do dono.
  */
 export function calculateFaturamentoNecessario(input: DiagnosticInput): number {
-  const { custosFixos, custoProductPercent, taxaPercent, proLabore } = input;
+  const { custosFixos, custoProductPercent, taxaPercent, proLabore, gastosFreteEntrega = 0 } = input;
   const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100);
   if (margemContribuicao <= 0) return Infinity;
-  return (custosFixos + proLabore) / margemContribuicao;
+  return (custosFixos + proLabore + gastosFreteEntrega) / margemContribuicao;
 }
 
 /**
