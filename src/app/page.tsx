@@ -1,11 +1,19 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Hero } from '@/components/landing/Hero';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Benefits } from '@/components/landing/Benefits';
 import { CTA } from '@/components/landing/CTA';
 
 export default function Home() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('teste') === 'trilha2026') {
+      sessionStorage.setItem('raiox_test_mode', 'true');
+    }
+  }, []);
+
   return (
     <main>
       <Hero />
