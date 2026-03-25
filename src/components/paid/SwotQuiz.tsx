@@ -65,7 +65,7 @@ const STEP_LABELS: Record<SwotSubStep, string> = {
 const QUADRANT_COLORS: Record<string, string> = {
   'Forças': 'text-green-600',
   'Fraquezas': 'text-red-500',
-  'Oportunidades': 'text-blue-600',
+  'Oportunidades': 'text-green-600',
   'Ameaças': 'text-orange-500',
 };
 
@@ -341,7 +341,7 @@ function TextFields({ question, subtitle, values, placeholders, onChange }: Text
             value={val}
             onChange={e => onChange(i, e.target.value)}
             placeholder={placeholders[i] ?? `Item ${i + 1}`}
-            className="w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+            className="w-full px-4 py-3 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1" style={{}} onFocus={e => { e.currentTarget.style.borderColor='#1B5E20'; e.currentTarget.style.boxShadow='0 0 0 1px #4CAF50'; }} onBlur={e => { e.currentTarget.style.borderColor=''; e.currentTarget.style.boxShadow=''; }}
           />
         ))}
       </div>

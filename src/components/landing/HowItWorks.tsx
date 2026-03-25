@@ -47,7 +47,7 @@ export function HowItWorks() {
               transition={{ delay: i * 0.15 }}
               className="text-center"
             >
-              <div className="relative w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-4">
+              <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#1B5E20' }}>
                 <step.icon className="w-8 h-8 text-white" />
                 <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gray-900 text-white text-sm font-bold flex items-center justify-center">
                   {step.number}

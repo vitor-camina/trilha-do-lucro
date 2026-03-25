@@ -31,8 +31,8 @@ const CROSSING_CONFIG: Record<SwotCrossingType, { label: string; question: strin
   ST: {
     label: 'Força × Ameaça',
     question: 'De 1 a 5, o quanto essa força ajuda a reduzir essa ameaça?',
-    color: 'text-blue-700',
-    bg: 'bg-blue-50 border-blue-200',
+    color: 'text-green-700',
+    bg: 'bg-green-50 border-green-200',
   },
   WO: {
     label: 'Fraqueza × Oportunidade',

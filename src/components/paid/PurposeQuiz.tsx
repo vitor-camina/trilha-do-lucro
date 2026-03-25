@@ -82,15 +82,15 @@ export default function PurposeQuiz({ initial, onComplete, onBack }: PurposeQuiz
       {/* Cabeçalho com progresso */}
       <div className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
-            <Target className="w-4 h-4 text-blue-600" />
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#E8F5E9' }}>
+            <Target className="w-4 h-4" style={{ color: '#1B5E20' }} />
           </div>
-          <span className="text-sm font-semibold text-blue-600">Propósito & Valores</span>
+          <span className="text-sm font-semibold" style={{ color: '#1B5E20' }}>Propósito & Valores</span>
           <span className="ml-auto text-xs text-gray-400">{step + 1} / {TOTAL}</span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
           <motion.div
-            className="bg-blue-600 h-1.5 rounded-full"
+            className="h-1.5 rounded-full" style={{ backgroundColor: '#1B5E20' }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
           />
@@ -169,7 +169,7 @@ export default function PurposeQuiz({ initial, onComplete, onBack }: PurposeQuiz
           size="lg"
           onClick={handleNext}
           disabled={!isValid()}
-          className="flex-1 h-14 rounded-xl text-base font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-40"
+          className="flex-1 h-14 rounded-xl text-base font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)', color: '#1B5E20' }}
         >
           {step === TOTAL - 1 ? 'Próxima etapa' : (
             <>Próximo <ArrowRight className="w-5 h-5 ml-1" /></>
@@ -200,7 +200,7 @@ function TextStep({ question, subtitle, value, onChange, placeholder }: TextStep
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         rows={5}
-        className="w-full p-4 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-2xl resize-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 leading-relaxed"
+        className="w-full p-4 text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded-2xl resize-none focus:outline-none leading-relaxed" onFocus={e => { e.currentTarget.style.borderColor='#1B5E20'; e.currentTarget.style.boxShadow='0 0 0 1px #4CAF50'; }} onBlur={e => { e.currentTarget.style.borderColor=''; e.currentTarget.style.boxShadow=''; }}
       />
     </div>
   );
@@ -219,7 +219,7 @@ function ValuesStep({ selected, onToggle }: ValuesStepProps) {
       </h2>
       <p className="text-sm text-gray-500">
         Selecione até 3 valores.{' '}
-        <span className={selected.length >= 3 ? 'font-semibold text-blue-600' : 'text-gray-400'}>
+        <span className={selected.length >= 3 ? 'font-semibold' : 'text-gray-400'} style={selected.length >= 3 ? { color: '#1B5E20' } : {}}>
           {selected.length}/3 selecionados
         </span>
       </p>
@@ -236,11 +236,12 @@ function ValuesStep({ selected, onToggle }: ValuesStepProps) {
               className={[
                 'px-4 py-2 rounded-xl text-sm font-medium border transition-all',
                 isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                  ? 'text-white shadow-sm'
                   : isDisabled
                     ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400 hover:bg-blue-50',
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-green-400 hover:bg-green-50',
               ].join(' ')}
+              style={isSelected ? { backgroundColor: '#1B5E20', borderColor: '#1B5E20' } : {}}
             >
               {val}
             </button>

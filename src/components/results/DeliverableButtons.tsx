@@ -68,7 +68,7 @@ export function DeliverableButtons({
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           placeholder="Nome do seu negócio (para o relatório)"
-          className="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+          className="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none" style={{ outline: 'none' }} onFocus={e => e.currentTarget.style.borderColor='#1B5E20'} onBlur={e => e.currentTarget.style.borderColor=''}
         />
       </div>
 
@@ -79,7 +79,7 @@ export function DeliverableButtons({
           type="button"
           onClick={handleDownloadPdf}
           disabled={loadingPdf}
-          className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center gap-4 hover:border-blue-200 hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-60"
+          className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center gap-4 hover:border-green-200 hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-60"
         >
           <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
             <FileText className="w-6 h-6 text-red-500" />
@@ -120,10 +120,10 @@ export function DeliverableButtons({
         <button
           type="button"
           onClick={onShowChecklist}
-          className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center gap-4 hover:border-blue-200 hover:shadow-md transition-all active:scale-[0.98]"
+          className="w-full bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center gap-4 hover:border-green-200 hover:shadow-md transition-all active:scale-[0.98]"
         >
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <ListChecks className="w-6 h-6 text-blue-500" />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#E8F5E9' }}>
+            <ListChecks className="w-6 h-6" style={{ color: '#1B5E20' }} />
           </div>
           <div className="flex-1 text-left">
             <p className="text-sm font-semibold text-gray-900">Plano de ação 30/60/90 dias</p>

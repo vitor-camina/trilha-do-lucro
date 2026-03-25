@@ -13,7 +13,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6" style={{ backgroundColor: '#E8F5E9', color: '#1B5E20' }}
         >
           <BarChart3 className="w-4 h-4" />
           Diagnóstico gratuito em 3 minutos
@@ -27,7 +27,7 @@ export function Hero() {
           className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-6"
         >
           Você sabe se sua loja está{' '}
-          <span className="text-blue-600">lucrando de verdade?</span>
+          <span style={{ color: '#1B5E20' }}>lucrando de verdade?</span>
         </motion.h1>
 
         {/* Subtítulo */}
@@ -50,7 +50,7 @@ export function Hero() {
           <Link href="/diagnostico">
             <Button
               size="lg"
-              className="h-14 px-8 rounded-xl text-lg font-semibold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
+              className="h-14 px-8 rounded-xl text-lg font-semibold shadow-lg" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)', color: '#1B5E20', boxShadow: '0 4px 14px rgba(249,168,37,0.4)' }}
             >
               Fazer meu diagnóstico grátis
               <ArrowRight className="w-5 h-5 ml-2" />

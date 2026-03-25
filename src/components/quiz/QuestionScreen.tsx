@@ -58,7 +58,7 @@ export function QuestionScreen({ question, value, onChange, direction }: Questio
       {question.hint && (
         <button
           onClick={() => setShowHint(!showHint)}
-          className="mt-6 flex items-center gap-1 text-sm text-blue-500 hover:text-blue-600 transition-colors"
+          className="mt-6 flex items-center gap-1 text-sm hover:opacity-80 transition-colors" style={{ color: '#1B5E20' }}
         >
           {showHint ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           {showHint ? 'Esconder dica' : 'Não sabe? Veja uma dica'}
@@ -68,7 +68,7 @@ export function QuestionScreen({ question, value, onChange, direction }: Questio
         <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-sm text-gray-500 text-center max-w-sm bg-blue-50 rounded-xl p-3"
+          className="mt-2 text-sm text-gray-500 text-center max-w-sm rounded-xl p-3" style={{ backgroundColor: '#E8F5E9' }}
         >
           {question.hint}
         </motion.p>

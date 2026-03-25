@@ -77,7 +77,7 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
           size="lg"
           onClick={handleNext}
           disabled={!isValid}
-          className="flex-1 h-14 rounded-xl text-lg font-semibold bg-blue-600 hover:bg-blue-700 disabled:opacity-40"
+          className="flex-1 h-14 rounded-xl text-lg font-semibold disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)', color: '#1B5E20' }}
         >
           {isLastStep ? (
             'Ver meu Diagnóstico'

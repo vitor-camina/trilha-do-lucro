@@ -47,7 +47,7 @@ export function CurrencyInput({ value, onChange, placeholder }: CurrencyInputPro
         value={displayValue}
         onChange={handleChange}
         placeholder={placeholder || '0'}
-        className="w-full pl-14 pr-4 py-4 text-3xl font-bold text-center bg-white border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none transition-colors"
+        className="w-full pl-14 pr-4 py-4 text-3xl font-bold text-center bg-white border-2 border-gray-200 rounded-2xl focus:outline-none transition-colors" style={{}} onFocus={e => e.currentTarget.style.borderColor='#1B5E20'} onBlur={e => e.currentTarget.style.borderColor=''}
         autoComplete="off"
       />
     </div>

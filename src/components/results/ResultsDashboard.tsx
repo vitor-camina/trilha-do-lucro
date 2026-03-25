@@ -188,7 +188,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             <button
               type="button"
               onClick={dismissSavedProgress}
-              className="text-xs text-blue-200 hover:text-white"
+              className="text-xs hover:text-white" style={{ color: '#4CAF50' }}
             >
               Ignorar
             </button>
@@ -421,7 +421,7 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
 
       {/* Propósito, Missão, Visão */}
       {[
-        { label: 'Propósito', text: strategy.purpose, color: 'border-l-blue-500' },
+        { label: 'Propósito', text: strategy.purpose, color: 'border-l-green-600' },
         { label: 'Missão', text: strategy.mission, color: 'border-l-green-500' },
         { label: 'Visão', text: strategy.vision, color: 'border-l-purple-500' },
       ].map(({ label, text, color }) => (
@@ -496,7 +496,7 @@ function SwotSummary({ answers }: SwotSummaryProps) {
       items: [...answers.weaknesses.filter(s => s.trim()), answers.weaknessPain].filter(Boolean),
     },
     {
-      label: 'Oportunidades', color: 'text-blue-700', bg: 'bg-blue-50',
+      label: 'Oportunidades', color: 'text-green-700', bg: 'bg-green-50',
       items: [...answers.opportunities.filter(s => s.trim()), ...answers.opportunityChoices],
     },
     {

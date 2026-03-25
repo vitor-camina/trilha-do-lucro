@@ -59,8 +59,8 @@ export function Benefits() {
               transition={{ delay: i * 0.1 }}
               className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
             >
-              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
-                <benefit.icon className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#E8F5E9' }}>
+                <benefit.icon className="w-6 h-6" style={{ color: '#1B5E20' }} />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">{benefit.description}</p>
