@@ -4,10 +4,11 @@ import type { DiagnosticInput, DiagnosticResult } from '@/types';
  * Calcula o lucro real: o que sobra depois de pagar tudo (incluindo o salário do dono).
  */
 export function calculateLucroReal(input: DiagnosticInput): number {
-  const { faturamento, custosFixos, custoProductPercent, taxaPercent, proLabore, gastosFreteEntrega = 0 } = input;
+  const { faturamento, custosFixos, custoProductPercent, taxaPercent, proLabore, fretePercentual = 0 } = input;
   const custosProduto = faturamento * (custoProductPercent / 100);
   const taxas = faturamento * (taxaPercent / 100);
-  return faturamento - custosFixos - custosProduto - taxas - proLabore - gastosFreteEntrega;
+  const frete = faturamento * (fretePercentual / 100);
+  return faturamento - custosFixos - custosProduto - taxas - proLabore - frete;
 }
 
 /**
@@ -22,22 +23,23 @@ export function calculateMargemLiquida(input: DiagnosticInput): number {
 /**
  * Calcula o ponto de equilíbrio: o mínimo que precisa vender para não ter prejuízo
  * (sem contar o salário do dono).
+ * O frete é variável, portanto entra na margem de contribuição.
  */
 export function calculatePontoEquilibrio(input: DiagnosticInput): number {
-  const { custosFixos, custoProductPercent, taxaPercent, gastosFreteEntrega = 0 } = input;
-  const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100);
+  const { custosFixos, custoProductPercent, taxaPercent, fretePercentual = 0 } = input;
+  const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100) - (fretePercentual / 100);
   if (margemContribuicao <= 0) return Infinity;
-  return (custosFixos + gastosFreteEntrega) / margemContribuicao;
+  return custosFixos / margemContribuicao;
 }
 
 /**
  * Calcula o faturamento necessário para cobrir tudo + salário do dono.
  */
 export function calculateFaturamentoNecessario(input: DiagnosticInput): number {
-  const { custosFixos, custoProductPercent, taxaPercent, proLabore, gastosFreteEntrega = 0 } = input;
-  const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100);
+  const { custosFixos, custoProductPercent, taxaPercent, proLabore, fretePercentual = 0 } = input;
+  const margemContribuicao = 1 - (custoProductPercent / 100) - (taxaPercent / 100) - (fretePercentual / 100);
   if (margemContribuicao <= 0) return Infinity;
-  return (custosFixos + proLabore + gastosFreteEntrega) / margemContribuicao;
+  return (custosFixos + proLabore) / margemContribuicao;
 }
 
 /**
