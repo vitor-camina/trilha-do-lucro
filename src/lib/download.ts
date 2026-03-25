@@ -1,40 +1,40 @@
 /**
  * Dispara o download de um blob no navegador.
- * iOS Safari não respeita o atributo `download` em blob URLs — nesses casos
- * abre o arquivo em nova aba para que o usuário possa salvar via share sheet.
+ * Em mobile, exibe um link clicável porque o atributo `download` não é
+ * respeitado em cliques programáticos no Safari/iOS e Android WebView.
  */
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
 
-  // iOS Safari ignora o atributo `download` em blob: URLs.
-  const isIOS =
-    typeof navigator !== 'undefined' &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-    !(window as unknown as { MSStream?: unknown }).MSStream;
+  // Mobile Safari e Android WebView ignoram cliques programáticos com download=
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(
+    typeof navigator !== 'undefined' ? navigator.userAgent : ''
+  );
 
-  if (isIOS) {
-    const newWindow = window.open(url, '_blank');
-    if (!newWindow) {
-      // Pop-up bloqueado — exibe link visível como fallback
-      showFallbackLink(url, filename);
-    } else {
-      setTimeout(() => URL.revokeObjectURL(url), 30_000);
-    }
+  if (isMobile) {
+    showFallbackLink(url, filename);
     return;
   }
 
-  // Desktop e Android: clique programático com atributo download
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   a.style.display = 'none';
   document.body.appendChild(a);
-  a.click();
 
+  try {
+    a.click();
+  } catch {
+    document.body.removeChild(a);
+    showFallbackLink(url, filename);
+    return;
+  }
+
+  // Limpa o elemento e a URL após um delay para garantir que o download iniciou
   setTimeout(() => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, 1_000);
+  }, 1000);
 }
 
 function showFallbackLink(url: string, filename: string) {

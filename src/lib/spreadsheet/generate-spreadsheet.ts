@@ -79,7 +79,10 @@ export async function generateSpreadsheet(
   classification: BusinessClassification,
   businessName:   string,
 ) {
-  const ExcelJS = await import('exceljs');
+  const ExcelJSModule = await import('exceljs');
+  // Dynamic import of a CJS module wraps it as { default: module.exports }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ExcelJS = (ExcelJSModule as any).default ?? ExcelJSModule;
   const workbook = new ExcelJS.Workbook();
   workbook.creator  = 'Raio-X do Negócio';
   workbook.created  = new Date();
