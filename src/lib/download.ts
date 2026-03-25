@@ -1,35 +1,40 @@
 /**
  * Dispara o download de um blob no navegador.
- * Em mobile, se o clique automático não funcionar, exibe um link clicável como fallback.
+ * iOS Safari não respeita o atributo `download` em blob URLs — nesses casos
+ * abre o arquivo em nova aba para que o usuário possa salvar via share sheet.
  */
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
+
+  // iOS Safari ignora o atributo `download` em blob: URLs.
+  const isIOS =
+    typeof navigator !== 'undefined' &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+    !(window as unknown as { MSStream?: unknown }).MSStream;
+
+  if (isIOS) {
+    const newWindow = window.open(url, '_blank');
+    if (!newWindow) {
+      // Pop-up bloqueado — exibe link visível como fallback
+      showFallbackLink(url, filename);
+    } else {
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    }
+    return;
+  }
+
+  // Desktop e Android: clique programático com atributo download
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   a.style.display = 'none';
   document.body.appendChild(a);
+  a.click();
 
-  let downloaded = false;
-  try {
-    a.click();
-    downloaded = true;
-  } catch {
-    // fallback abaixo
-  }
-
-  // Limpa o elemento e a URL após um delay para garantir que o download iniciou
   setTimeout(() => {
     document.body.removeChild(a);
-    if (downloaded) {
-      URL.revokeObjectURL(url);
-    }
-  }, 1000);
-
-  // Fallback mobile: se o clique automático falhou, exibe um link flutuante
-  if (!downloaded) {
-    showFallbackLink(url, filename);
-  }
+    URL.revokeObjectURL(url);
+  }, 1_000);
 }
 
 function showFallbackLink(url: string, filename: string) {
