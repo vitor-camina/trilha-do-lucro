@@ -5,7 +5,7 @@ export interface DiagnosticInput {
   custoProductPercent: number; // % do faturamento que é custo de produto
   taxaPercent: number;       // % de taxas (cartão, marketplace)
   proLabore: number;         // Salário desejado do dono
-  gastosFreteEntrega: number; // Gastos mensais com frete e entrega (opcional, default 0)
+  fretePercentual: number;   // % do faturamento gasto com frete (opcional, default 0)
 }
 
 // Resultado do diagnóstico

@@ -83,6 +83,7 @@ export async function generateSpreadsheet(
   // Dynamic import of a CJS module wraps it as { default: module.exports }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ExcelJS = (ExcelJSModule as any).default ?? ExcelJSModule;
+  console.log('ExcelJS loaded:', !!ExcelJS, 'Workbook:', typeof ExcelJS?.Workbook);
   const workbook = new ExcelJS.Workbook();
   workbook.creator  = 'Raio-X do Negócio';
   workbook.created  = new Date();
@@ -282,7 +283,8 @@ export async function generateSpreadsheet(
   const fat = input.faturamento;
   const custosProduto   = fat * (input.custoProductPercent / 100);
   const custosTaxas     = fat * (input.taxaPercent / 100);
-  const frete           = input.gastosFreteEntrega ?? 0;
+  const fretePercentual = input.fretePercentual ?? 0;
+  const frete           = fat * (fretePercentual / 100);
   const totalCustos     = input.custosFixos + custosProduto + custosTaxas + input.proLabore + frete;
 
   const custoRows: Array<[string, number, string]> = [
@@ -290,7 +292,7 @@ export async function generateSpreadsheet(
     ['Custo de Produtos',      custosProduto,              `${input.custoProductPercent}% do faturamento`],
     ['Taxas (cartão/mkt)',     custosTaxas,                `${input.taxaPercent}% do faturamento`],
     ['Pró-labore (salário)',   input.proLabore,            'Retirada do dono'],
-    ['Frete e Entrega',        frete,                      'Correios, motoboy, transportadoras'],
+    ['Frete e Entrega',        frete,                      `${fretePercentual}% do faturamento`],
   ];
 
   custoRows.forEach(([label, valor, detalhe], i) => {
@@ -392,7 +394,7 @@ export async function generateSpreadsheet(
     ['Custo do Produto (%)',       `${input.custoProductPercent}%`,       '% do faturamento gasto com mercadoria'],
     ['Taxas (cartão/marketplace)', `${input.taxaPercent}%`,              '% pago em taxas sobre as vendas'],
     ['Pró-labore Desejado',        brl(input.proLabore),                 'Salário que o dono quer retirar'],
-    ['Frete e Entrega',            brl(input.gastosFreteEntrega ?? 0),   'Correios, motoboy, transportadoras'],
+    ['Frete e Entrega (%)',         `${input.fretePercentual ?? 0}%`,     '% do faturamento gasto com frete'],
   ];
 
   inputRows.forEach(([campo, valor, desc], i) => {

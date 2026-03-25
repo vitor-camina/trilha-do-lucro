@@ -244,9 +244,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             <p className="text-gray-400">Taxas</p>
             <p className="font-semibold text-gray-900">{input.taxaPercent}%</p>
           </div>
-          <div className="col-span-2">
+          <div>
             <p className="text-gray-400">Pró-labore desejado</p>
             <p className="font-semibold text-gray-900">{formatBRL(input.proLabore)}</p>
+          </div>
+          <div>
+            <p className="text-gray-400">Frete</p>
+            <p className="font-semibold text-gray-900">{input.fretePercentual ?? 0}% do faturamento</p>
           </div>
         </div>
       </motion.div>

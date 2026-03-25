@@ -39,12 +39,13 @@ export function DeliverableButtons({
   }
 
   async function handleDownloadXlsx() {
+    console.log('Download started');
     setLoadingXlsx(true);
     try {
       const { generateSpreadsheet } = await import('@/lib/spreadsheet/generate-spreadsheet');
       await generateSpreadsheet(input, result, classification, businessName);
     } catch (err) {
-      console.error('Erro ao gerar planilha:', err);
+      console.error('Download error:', err);
     } finally {
       setLoadingXlsx(false);
     }
