@@ -35,7 +35,18 @@ interface ResultsDashboardProps {
 
 export function ResultsDashboard({ input, result, classification, insights, onRestart }: ResultsDashboardProps) {
   const isPositive = result.lucroReal >= 0;
-  const [isPaid, setIsPaid] = useState(false);
+  const [isPaid, setIsPaid] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('teste') === 'trilha2026') {
+      sessionStorage.setItem('raiox_test_mode', 'true');
+      return true;
+    }
+    if (sessionStorage.getItem('raiox_test_mode') === 'true') return true;
+    if (params.get('acesso') === 'liberado') return true;
+    if (localStorage.getItem('raiox_paid') === 'true') return true;
+    return false;
+  });
   const [showChecklist, setShowChecklist] = useState(false);
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
   const searchParams = useSearchParams();
@@ -51,9 +62,9 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     goToStep,
   } = useProgress(input);
 
-  // Verifica acesso pago
+  // Verifica acesso pago (sincroniza se URL mudar após mount)
   useEffect(() => {
-    // Modo teste: ?teste=trilha2026 bypassa o paywall
+    if (isPaid) return;
     if (searchParams.get('teste') === 'trilha2026') {
       sessionStorage.setItem('raiox_test_mode', 'true');
       setIsPaid(true);
@@ -63,7 +74,6 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       setIsPaid(true);
       return;
     }
-
     const params = new URLSearchParams(window.location.search);
     if (params.get('acesso') === 'liberado') {
       setIsPaid(true);
@@ -72,7 +82,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     } else if (localStorage.getItem('raiox_paid') === 'true') {
       setIsPaid(true);
     }
-  }, [searchParams]);
+  }, [searchParams, isPaid]);
 
   function handleUnlock() {
     setIsPaid(true);
