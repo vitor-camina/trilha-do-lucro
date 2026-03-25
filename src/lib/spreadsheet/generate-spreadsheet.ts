@@ -2220,7 +2220,7 @@ export async function generateSpreadsheet(
   // ══════════════════════════════════════════════════════════════════════════
   //  ABA 13 — PLANO DE AÇÃO 30/60/90
   // ══════════════════════════════════════════════════════════════════════════
-  const plan = workbook.addWorksheet('Plano de Ação 30/60/90', {
+  const plan = workbook.addWorksheet('Plano de Ação 30-60-90', {
     properties: { tabColor: { argb: 'FF0F766E' } },
   });
   plan.getColumn(1).width = 14;
