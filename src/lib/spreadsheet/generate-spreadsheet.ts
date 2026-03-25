@@ -329,7 +329,7 @@ export async function generateSpreadsheet(
   totalRow.getCell(3).font  = { bold: true, size: 11, color: { argb: pctTotal > 85 ? C.redText : C.greenText } };
   totalRow.getCell(3).fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.resultBg } };
   totalRow.getCell(3).alignment = { horizontal: 'center' };
-  dash.mergeCells('D24:F24');
+  // D24:F24 is already merged by the custoRows loop above (last iteration, i=4)
 
   // Linha de faturamento vs custos
   const compRow = dash.getRow(25);
