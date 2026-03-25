@@ -5,6 +5,7 @@ export interface DiagnosticInput {
   custoProductPercent: number; // % do faturamento que é custo de produto
   taxaPercent: number;       // % de taxas (cartão, marketplace)
   proLabore: number;         // Salário desejado do dono
+  gastosFreteEntrega: number; // Gastos mensais com frete e entrega (opcional, default 0)
 }
 
 // Resultado do diagnóstico
@@ -54,6 +55,7 @@ export interface QuizQuestion {
   step?: number;
   defaultValue?: number;
   placeholder?: string;
+  optional?: boolean; // se true, valor 0 é permitido
 }
 
 // Checklist de ações 30/60/90 dias

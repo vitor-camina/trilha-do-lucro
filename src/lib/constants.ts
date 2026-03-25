@@ -100,4 +100,13 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     placeholder: 'Ex: 5.000',
     min: 0,
   },
+  {
+    id: 'gastosFreteEntrega',
+    question: 'Quanto você gasta com frete e entrega por mês?',
+    subtitle: 'Inclua tudo: Correios, motoboy, transportadoras, embalagens para envio... Se não tiver ou não souber, pode deixar em zero.',
+    type: 'currency',
+    placeholder: 'Ex: 800',
+    min: 0,
+    optional: true,
+  },
 ];

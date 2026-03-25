@@ -16,6 +16,7 @@ export function useDiagnostic() {
     custoProductPercent: 45,
     taxaPercent: 8,
     proLabore: 0,
+    gastosFreteEntrega: 0,
   });
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [classification, setClassification] = useState<BusinessClassification | null>(null);
@@ -49,6 +50,7 @@ export function useDiagnostic() {
       custoProductPercent: 45,
       taxaPercent: 8,
       proLabore: 0,
+      gastosFreteEntrega: 0,
     });
     setResult(null);
     setClassification(null);
