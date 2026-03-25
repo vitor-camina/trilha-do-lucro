@@ -140,20 +140,48 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   // ─── Tela principal (financial + strategy resultado) ────────────────────
 
   return (
-    <div className="min-h-[100dvh] bg-gray-50 pb-8">
+    <div className="min-h-[100dvh] pb-8" style={{ backgroundColor: '#F5F5F5' }}>
+      {/* Header com logo */}
+      <div className="flex items-center justify-center py-4 px-6" style={{ backgroundColor: '#1B5E20' }}>
+        <div className="flex items-center gap-3">
+          {/* SVG bússola inline */}
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="18" stroke="#F9A825" strokeWidth="2.5" fill="none" />
+            <circle cx="20" cy="20" r="12" fill="#2E7D32" fillOpacity="0.3" />
+            {/* Agulha norte — dourada, aponta para cima */}
+            <polygon points="20,5 22.5,20 20,17 17.5,20" fill="#F9A825" />
+            {/* Agulha sul — verde escuro */}
+            <polygon points="20,35 17.5,20 20,23 22.5,20" fill="#1B5E20" />
+            <circle cx="20" cy="20" r="2.5" fill="#F9A825" />
+            {/* Marcadores cardeais */}
+            <text x="18.5" y="4" fill="#F9A825" fontSize="4" fontWeight="bold" fontFamily="sans-serif">N</text>
+          </svg>
+          <div>
+            <p className="text-xs font-semibold text-green-300 leading-none tracking-widest uppercase">
+              Trilha do
+            </p>
+            <p className="text-xl font-extrabold leading-none tracking-wide" style={{ color: '#F9A825', fontFamily: 'var(--font-montserrat), sans-serif' }}>
+              LUCRO
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Banner "continuar de onde parou" */}
       {hasSavedProgress && isPaid && (
         <motion.div
           initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-blue-600 text-white px-5 py-3 flex items-center justify-between gap-3"
+          className="text-white px-5 py-3 flex items-center justify-between gap-3"
+          style={{ backgroundColor: '#1B5E20' }}
         >
           <p className="text-sm font-medium">Você tem uma análise salva. Continuar de onde parou?</p>
           <div className="flex gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={restoreProgress}
-              className="text-xs font-bold bg-white text-blue-600 rounded-lg px-3 py-1.5"
+              className="text-xs font-bold bg-white rounded-lg px-3 py-1.5"
+              style={{ color: '#1B5E20' }}
             >
               Continuar
             </button>
@@ -169,7 +197,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       )}
 
       {/* Header com classificação — GRÁTIS */}
-      <div className="bg-white pt-8 pb-6 px-6">
+      <div className="bg-white pt-6 pb-6 px-6">
         <BusinessClassBadge classification={classification} />
       </div>
 
@@ -226,7 +254,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       {/* PAYWALL ou conteúdo pago */}
       {!isPaid ? (
         <div className="mt-4">
-          <PaywallScreen onUnlock={handleUnlock} hotmartUrl={HOTMART_CHECKOUT_URL} />
+          <PaywallScreen
+            onUnlock={handleUnlock}
+            hotmartUrl={HOTMART_CHECKOUT_URL}
+            input={input}
+            result={result}
+          />
         </div>
       ) : (
         <>
@@ -296,10 +329,11 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mx-4 mt-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-5"
+              className="mx-4 mt-6 rounded-2xl p-5"
+              style={{ border: '1px solid #C8E6C9', background: 'linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)' }}
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#1B5E20' }}>
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
@@ -313,7 +347,8 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                     type="button"
                     size="lg"
                     onClick={() => goToStep('purpose')}
-                    className="w-full h-12 rounded-xl text-base font-semibold bg-blue-600 hover:bg-blue-700"
+                    className="w-full h-12 rounded-xl text-base font-semibold text-white"
+                    style={{ backgroundColor: '#1B5E20' }}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Iniciar análise estratégica
@@ -377,7 +412,8 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
         <button
           type="button"
           onClick={onRedo}
-          className="text-xs text-blue-500 hover:text-blue-600"
+          className="text-xs hover:opacity-80"
+          style={{ color: '#1B5E20' }}
         >
           Refazer análise
         </button>

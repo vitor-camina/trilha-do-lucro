@@ -2,21 +2,91 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, ArrowRight, Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import type { DiagnosticInput, DiagnosticResult } from '@/types';
 
 interface PaywallScreenProps {
   onUnlock: () => void;
   hotmartUrl: string;
+  input?: DiagnosticInput;
+  result?: DiagnosticResult;
 }
 
-export function PaywallScreen({ onUnlock, hotmartUrl }: PaywallScreenProps) {
-  const [email, setEmail] = useState('');
-  const [showEmailInput, setShowEmailInput] = useState(true);
+const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '37,00';
+const PRICE_ORIGINAL = '197,00';
 
-  function handleContinue() {
+const DELIVERABLES = [
+  {
+    benefit: 'Descubra exatamente quanto cobrar em cada produto para nunca mais vender no prejuízo',
+    tag: 'Precificação',
+  },
+  {
+    benefit: 'Saiba quais produtos dão lucro e quais estão sugando sua margem em silêncio',
+    tag: 'Curva ABC',
+  },
+  {
+    benefit: 'Simule cenários reais: quanto precisa faturar para contratar, expandir ou sobreviver',
+    tag: 'Simulador',
+  },
+  {
+    benefit: 'Veja sua margem real de lucro — o número que seu contador provavelmente não te mostra',
+    tag: 'Margem Real',
+  },
+  {
+    benefit: 'Saiba o mínimo que precisa faturar para não fechar o mês no vermelho',
+    tag: 'Ponto de Equilíbrio',
+  },
+  {
+    benefit: 'Descubra o faturamento exato para pagar todas as contas e ainda se pagar direito',
+    tag: 'Faturamento Ideal',
+  },
+  {
+    benefit: 'Relatório completo em PDF para guardar, compartilhar ou apresentar a investidores',
+    tag: 'Relatório PDF',
+  },
+  {
+    benefit: 'Planilha de controle financeiro pronta para usar nos próximos 12 meses',
+    tag: 'Planilha 12 Meses',
+  },
+  {
+    benefit: 'Recomendações personalizadas baseadas no perfil real do seu negócio',
+    tag: 'Insights',
+  },
+  {
+    benefit: 'Planejamento estratégico completo: missão, visão, valores e propósito da sua loja',
+    tag: 'Estratégia',
+  },
+  {
+    benefit: 'Análise SWOT guiada para enxergar suas forças, fraquezas, oportunidades e ameaças',
+    tag: 'SWOT',
+  },
+  {
+    benefit: 'Seus 5 maiores movimentos estratégicos com base nos cruzamentos do SWOT',
+    tag: 'Cruzamentos',
+  },
+  {
+    benefit: 'Plano de ação personalizado para os próximos 30, 60 e 90 dias',
+    tag: 'Plano de Ação',
+  },
+];
+
+export function PaywallScreen({ onUnlock, hotmartUrl, input, result }: PaywallScreenProps) {
+  const [email, setEmail] = useState('');
+
+  const margem = result?.margemLiquida ?? 0;
+  const faturamento = input?.faturamento ?? 0;
+
+  const porMil = Math.round(margem * 10);
+
+  const targetMargem = 0.20;
+  const currentMargem = margem / 100;
+  const gapMensal = faturamento > 0 ? Math.max(0, (targetMargem - currentMargem) * faturamento) : 0;
+  const gapAnual = gapMensal * 12;
+
+  const hasRealData = faturamento > 0 && result != null;
+
+  function handleCTA() {
     if (email) {
-      // Salva o email no localStorage para remarketing futuro
       try {
         const leads = JSON.parse(localStorage.getItem('raiox_leads') || '[]');
         leads.push({ email, date: new Date().toISOString() });
@@ -25,134 +95,187 @@ export function PaywallScreen({ onUnlock, hotmartUrl }: PaywallScreenProps) {
         // silently fail
       }
     }
-    // Redireciona para checkout da Hotmart
     window.open(hotmartUrl, '_blank');
-    setShowEmailInput(false);
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="relative"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mx-4 mb-8"
     >
-      {/* Conteúdo borrado por trás */}
-      <div className="blur-sm opacity-40 pointer-events-none select-none px-4 space-y-3">
-        {/* Placeholders simulando as métricas */}
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gray-100 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="h-3 bg-gray-200 rounded w-32 mb-2" />
-                <div className="h-6 bg-gray-300 rounded w-24 mb-1" />
-                <div className="h-2 bg-gray-100 rounded w-48" />
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* Placeholder de insights */}
-        <div className="mt-4">
-          <div className="h-5 bg-gray-200 rounded w-36 mb-3" />
+      {/* Blur overlay hint */}
+      <div className="relative mb-4 overflow-hidden rounded-2xl">
+        <div className="blur-sm opacity-30 pointer-events-none select-none p-4 space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-50 rounded-2xl p-4 mb-3">
-              <div className="h-3 bg-gray-200 rounded w-40 mb-2" />
-              <div className="h-2 bg-gray-100 rounded w-full mb-1" />
-              <div className="h-2 bg-gray-100 rounded w-3/4" />
+            <div key={i} className="bg-white rounded-xl border border-gray-100 p-4">
+              <div className="h-3 bg-gray-200 rounded w-32 mb-2" />
+              <div className="h-6 bg-gray-300 rounded w-24 mb-1" />
+              <div className="h-2 bg-gray-100 rounded w-48" />
             </div>
           ))}
         </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent to-gray-100/80">
+          <span className="text-sm font-semibold text-brand-primary bg-white/90 px-4 py-2 rounded-full shadow">
+            Análise completa bloqueada
+          </span>
+        </div>
       </div>
 
-      {/* Overlay do paywall */}
-      <div className="absolute inset-0 flex items-start justify-center pt-16">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 mx-4 max-w-sm w-full"
-        >
-          {/* Ícone */}
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-7 h-7 text-blue-600" />
+      {/* Card principal */}
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+
+        {/* Header verde com headline de dor */}
+        <div className="px-6 pt-6 pb-5" style={{ backgroundColor: '#1B5E20' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0" style={{ color: '#F9A825' }} />
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#F9A825' }}>
+              Diagnóstico Personalizado
+            </span>
+          </div>
+          {hasRealData ? (
+            <>
+              <h2
+                className="text-xl font-bold text-white leading-tight mb-2"
+                style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
+              >
+                {margem <= 0
+                  ? 'Sua loja está operando no vermelho — cada dia assim aprofunda o buraco.'
+                  : `Sua margem é de ${margem.toFixed(1)}% — de cada R$\u00A01.000 que entra, só R$\u00A0${porMil} fica com você.`}
+              </h2>
+              {gapAnual > 1000 && (
+                <p className="text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                  Se nada mudar nos próximos 12 meses, você vai deixar aproximadamente{' '}
+                  <span className="font-bold" style={{ color: '#F9A825' }}>
+                    R$&nbsp;{gapAnual.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>{' '}
+                  na mesa — dinheiro que poderia estar no seu bolso.
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <h2
+                className="text-xl font-bold text-white leading-tight mb-2"
+                style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
+              >
+                Você sabe exatamente quanto está deixando de ganhar todo mês?
+              </h2>
+              <p className="text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                A maioria dos lojistas descobre que a margem real é metade do que imaginava.
+                Cada mês sem ajustar a precificação é dinheiro que não volta.
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="px-6 py-5 space-y-5">
+
+          {/* O que está incluso — 13 itens */}
+          <div>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+              O que você vai desbloquear agora
+            </p>
+            <ul className="space-y-2.5">
+              {DELIVERABLES.map(({ benefit, tag }) => (
+                <li key={tag} className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+                  <span className="text-sm text-gray-700 leading-snug">{benefit}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Título */}
-          <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-            Desbloqueie seu diagnóstico completo
-          </h3>
-
-          {/* O que está incluso */}
-          <ul className="text-sm text-gray-600 space-y-2 mb-5">
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Lucro real e margem detalhados
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Ponto de equilíbrio e faturamento ideal
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Relatório PDF para baixar e guardar
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Planilha de controle financeiro (12 meses)
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Plano de ação 30/60/90 dias personalizado
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-green-500">✓</span> Refaça quantas vezes quiser
-            </li>
-          </ul>
-
-          {/* Preço com ancoragem */}
-          <div className="text-center mb-4">
-            <p className="text-sm text-gray-400 line-through mb-1">De R$ 97,00</p>
-            <span className="text-3xl font-bold text-gray-900">R$ 37,00</span>
-            <p className="text-xs text-gray-400 mt-1">Pagamento único. Acesso imediato.</p>
+          {/* Ancoragem de preço */}
+          <div className="rounded-2xl p-4" style={{ backgroundColor: '#FFFDE7', border: '1px solid #F9A825' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#5D4037' }}>
+              <span className="font-bold">Para ter esse diagnóstico do zero:</span> um consultor financeiro
+              cobra de <span className="font-semibold">R$&nbsp;2.000 a R$&nbsp;5.000</span>. Uma mentoria de
+              gestão custa <span className="font-semibold">R$&nbsp;300/mês</span>.
+            </p>
+            <p className="text-sm font-bold mt-1.5" style={{ color: '#5D4037' }}>
+              O Trilha do Lucro entrega tudo isso por menos que uma pizza.
+            </p>
           </div>
 
-          {/* Input de email */}
-          {showEmailInput && (
-            <div className="mb-3">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu melhor email"
-                  className="w-full pl-10 pr-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-              <p className="text-xs text-gray-400 mt-1 text-center">
-                Para enviar seu diagnóstico por email
+          {/* Preço com ancoragem visual */}
+          <div className="text-center">
+            <p className="text-sm text-gray-400 line-through">De R$ {PRICE_ORIGINAL}</p>
+            <div className="flex items-baseline justify-center gap-1 mt-0.5">
+              <span className="text-sm font-medium text-gray-600">R$</span>
+              <span
+                className="text-4xl font-extrabold"
+                style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: '#1B5E20' }}
+              >
+                {PRICE_SALE}
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">Pagamento único · Acesso imediato · Sem mensalidade</p>
+          </div>
+
+          {/* Email */}
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Seu melhor e-mail (para receber o acesso)"
+            className="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2"
+            style={{ focusRingColor: '#1B5E20' } as React.CSSProperties}
+          />
+
+          {/* CTA dourado */}
+          <button
+            type="button"
+            onClick={handleCTA}
+            className="w-full py-4 rounded-2xl font-bold text-base shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+            style={{
+              background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)',
+              color: '#1B5E20',
+              fontFamily: 'var(--font-montserrat), sans-serif',
+            }}
+          >
+            DESBLOQUEAR MINHA ANÁLISE COMPLETA
+            <ArrowRight className="w-5 h-5 flex-shrink-0" />
+          </button>
+
+          {/* Gatilhos de confiança */}
+          <div className="space-y-2.5 pt-1">
+            <div className="flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+              <p className="text-xs text-gray-600 leading-snug">
+                <span className="font-semibold">Garantia de 7 dias</span> — se não fizer sentido para
+                seu negócio, devolvemos cada centavo. Sem perguntas.
               </p>
             </div>
-          )}
+            <div className="flex items-start gap-2.5">
+              <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#FF8F00' }} />
+              <p className="text-xs text-gray-600 leading-snug">
+                Cada dia sem ajustar sua precificação, sua margem continua sendo corroída.
+                O diagnóstico leva 3 minutos. A mudança pode ser permanente.
+              </p>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+              <p className="text-xs text-gray-600 leading-snug">
+                Lojistas que ajustam a precificação com base em dados reais aumentam
+                a margem em média{' '}
+                <span className="font-semibold" style={{ color: '#2E7D32' }}>8 a 15%</span>.
+              </p>
+            </div>
+          </div>
 
-          {/* CTA */}
-          <Button
+          {/* Link "já paguei" */}
+          <button
             type="button"
-            size="lg"
-            onClick={handleContinue}
-            className="w-full h-13 rounded-xl text-base font-semibold bg-blue-600 hover:bg-blue-700"
+            onClick={onUnlock}
+            className="w-full text-sm text-center py-1 underline underline-offset-2"
+            style={{ color: '#1B5E20' }}
           >
-            Desbloquear agora
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
+            Já paguei — liberar meu acesso
+          </button>
 
-          {/* Link para já pagou */}
-          {!showEmailInput && (
-            <button
-              type="button"
-              onClick={onUnlock}
-              className="w-full mt-3 text-sm text-blue-500 hover:text-blue-600 text-center"
-            >
-              Já paguei — liberar meu acesso
-            </button>
-          )}
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
