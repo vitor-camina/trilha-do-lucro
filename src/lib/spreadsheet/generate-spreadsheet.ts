@@ -394,8 +394,10 @@ export async function generateSpreadsheet(
     'Marketing e Publicidade',
     'Seguros',
     'Material de Limpeza / Escritório',
+    'Pró-labore (seu salário)',
     'Outros',
   ];
+  const proLaboreGastosIdx = gastosCategories.indexOf('Pró-labore (seu salário)');
 
   const firstDataRow = 4;
   const lastDataRow  = firstDataRow + gastosCategories.length - 1; // row 13
@@ -412,9 +414,9 @@ export async function generateSpreadsheet(
       : { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
     a.alignment = { vertical: 'middle' };
 
-    // B = valor (amarelo, editável) — pré-preenchemos apenas o total geral na linha de soma
+    // B = valor (amarelo, editável) — pró-labore pré-preenchido com input.proLabore
     const b = gastos.getCell(`B${r}`);
-    b.value  = 0;
+    b.value  = i === proLaboreGastosIdx ? input.proLabore : 0;
     b.numFmt = 'R$ #,##0.00';
     inputCell(b);
     b.alignment = { horizontal: 'right', vertical: 'middle' };
@@ -456,7 +458,7 @@ export async function generateSpreadsheet(
   gastos.getRow(totR + 2).height = 22;
   safeMerge(gastos, `A${totR + 2}:C${totR + 2}`);
   const gn = gastos.getCell(`A${totR + 2}`);
-  gn.value = `ℹ️  No seu diagnóstico você informou ${brl(input.custosFixos)} de gastos fixos. Distribua esse valor pelas categorias acima.`;
+  gn.value = `ℹ️  No seu diagnóstico você informou ${brl(input.custosFixos)} de gastos fixos. Pró-labore (${brl(input.proLabore)}) já foi pré-preenchido. Distribua os demais valores pelas categorias acima.`;
   gn.font  = { italic: true, size: 10, color: { argb: C.gray }, name: 'Arial' };
   gn.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
   gn.alignment = { wrapText: true, vertical: 'middle' };
@@ -822,47 +824,266 @@ export async function generateSpreadsheet(
   });
   fr++;
 
-  const annualRows: [string, number[]][] = [
-    ['(+) Receita de Vendas',             Array(12).fill(0).map((_, i) => i === 0 ? input.faturamento : 0)],
-    ['(-) Custo Mercadoria',              Array(12).fill(0).map((_, i) => i === 0 ? input.faturamento * (input.custoProductPercent / 100) : 0)],
-    ['(-) Taxas e Impostos',              Array(12).fill(0).map((_, i) => i === 0 ? input.faturamento * (input.taxaPercent / 100) : 0)],
-    ['(-) Frete',                         Array(12).fill(0).map((_, i) => i === 0 ? input.faturamento * (input.fretePercentual / 100) : 0)],
-    ['(=) Sobra das Vendas',              Array(12).fill(0).map((_, i) => i === 0 ? input.faturamento * mcSafe : 0)],
-    ['(-) Gastos Fixos',                  Array(12).fill(0).map((_, i) => i === 0 ? input.custosFixos : 0)],
-    ['(-) Pró-labore',                    Array(12).fill(0).map((_, i) => i === 0 ? input.proLabore : 0)],
-    ['(=) Resultado da Operação',         Array(12).fill(0).map((_, i) => i === 0 ? result.lucroReal : 0)],
+  // ── TABELA 12 MESES DETALHADA ─────────────────────────────────────────────
+  // Row offsets within the 12-month table (relative to dataStartRow)
+  const OFF_OP_HDR      = 0;
+  const OFF_RECEITA     = 1;
+  const OFF_CUSTO       = 2;
+  const OFF_TAXAS       = 3;
+  const OFF_FRETE       = 4;
+  const OFF_SOBRA       = 5;
+  const OFF_GASTOS      = 6;
+  const OFF_PROLABORE12 = 7;
+  const OFF_RESULT_OP   = 8;
+  const OFF_INV_HDR     = 9;
+  const OFF_EQUIP       = 10;
+  const OFF_REFORMA     = 11;
+  const OFF_ESTOQUE     = 12;
+  const OFF_TOTAL_INV   = 13;
+  const OFF_FIN_HDR     = 14;
+  const OFF_PARC_EMP    = 15;
+  const OFF_PARC_MAQ    = 16;
+  const OFF_DIN_EMP     = 17;
+  const OFF_SALDO_FIN   = 18;
+  const OFF_RESULT_FINAL = 19;
+
+  const dataStartRow = fr;
+
+  // Cross-sheet references into 'Meus Gastos Fixos'
+  // gastosCategories has 11 items: firstDataRow=4, proLabore at index 9 → row 13, totRow=15
+  const gfFirstDataRow = 4;
+  const gfProLaboreRow = gfFirstDataRow + proLaboreGastosIdx; // row 13
+  const gfTotalRow     = gfFirstDataRow + gastosCategories.length; // row 15
+  // Gastos Fixos in P&L = total MINUS pró-labore (shown separately to avoid double-counting)
+  const fGastosFixos = `'Meus Gastos Fixos'!$B$${gfTotalRow}-'Meus Gastos Fixos'!$B$${gfProLaboreRow}`;
+  const fProLaboreXS = `'Meus Gastos Fixos'!$B$${gfProLaboreRow}`;
+
+  // ── Column A: row labels ─────────────────────────────────────────────────
+  const rowDefs12: { off: number; lbl: string; kind: 'section'|'input'|'formula'|'result'|'final' }[] = [
+    { off: OFF_OP_HDR,       lbl: 'OPERACIONAL',              kind: 'section' },
+    { off: OFF_RECEITA,      lbl: '(+) Receita de Vendas',    kind: 'input'   },
+    { off: OFF_CUSTO,        lbl: '(-) Custo Mercadorias',    kind: 'formula' },
+    { off: OFF_TAXAS,        lbl: '(-) Taxas e Impostos',     kind: 'formula' },
+    { off: OFF_FRETE,        lbl: '(-) Frete',                kind: 'formula' },
+    { off: OFF_SOBRA,        lbl: '(=) Sobra das Vendas',     kind: 'result'  },
+    { off: OFF_GASTOS,       lbl: '(-) Gastos Fixos',         kind: 'formula' },
+    { off: OFF_PROLABORE12,  lbl: '(-) Pró-labore',           kind: 'formula' },
+    { off: OFF_RESULT_OP,    lbl: '(=) Resultado Operação',   kind: 'result'  },
+    { off: OFF_INV_HDR,      lbl: 'INVESTIMENTOS',            kind: 'section' },
+    { off: OFF_EQUIP,        lbl: '(-) Equipamentos',         kind: 'input'   },
+    { off: OFF_REFORMA,      lbl: '(-) Reforma',              kind: 'input'   },
+    { off: OFF_ESTOQUE,      lbl: '(-) Estoque Extra',        kind: 'input'   },
+    { off: OFF_TOTAL_INV,    lbl: '(=) Total Investido',      kind: 'result'  },
+    { off: OFF_FIN_HDR,      lbl: 'FINANCIAMENTOS',           kind: 'section' },
+    { off: OFF_PARC_EMP,     lbl: '(-) Parcelas Empréstimo',  kind: 'input'   },
+    { off: OFF_PARC_MAQ,     lbl: '(-) Parcelas Máquinas',    kind: 'input'   },
+    { off: OFF_DIN_EMP,      lbl: '(+) Dinheiro Emprestado',  kind: 'input'   },
+    { off: OFF_SALDO_FIN,    lbl: '(=) Saldo Financiamentos', kind: 'result'  },
+    { off: OFF_RESULT_FINAL, lbl: '(=) RESULTADO FINAL',      kind: 'final'   },
   ];
 
-  const isBoldRow = (name: string) => name.startsWith('(=)');
-
-  annualRows.forEach(([name, values], ri) => {
-    const r = fr + ri;
-    fluxo.getRow(r).height = 20;
-    const isResult = isBoldRow(name);
-
+  rowDefs12.forEach(({ off, lbl, kind }) => {
+    const r = dataStartRow + off;
+    fluxo.getRow(r).height = kind === 'final' ? 30 : kind === 'section' ? 22 : 20;
     const a = fluxo.getCell(`A${r}`);
-    a.value = name;
-    a.font  = { bold: isResult, size: 10, name: 'Arial', color: { argb: isResult ? C.headerBg : C.darkGray } };
-    a.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: isResult ? C.greenBg : (ri % 2 === 0 ? C.altRow : 'FFFFFFFF') } };
-    a.alignment = { vertical: 'middle' };
-
-    values.forEach((v, mi) => {
-      const cell = fluxo.getRow(r).getCell(mi + 2);
-      cell.value  = v;
-      cell.numFmt = 'R$ #,##0.00';
-      cell.font   = { bold: isResult, size: 10, name: 'Arial' };
-      if (mi === 0) {
-        // Mês 1 pré-preenchido (azulado para distinguir)
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isResult ? C.greenBg : C.inputBg } };
-      } else {
-        inputCell(cell);
-        cell.value = null;
-      }
-      cell.alignment = { horizontal: 'right', vertical: 'middle' };
-    });
+    a.value = lbl;
+    if (kind === 'section') {
+      a.font  = { bold: true, size: 10, name: 'Arial', color: { argb: C.headerText } };
+      a.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.headerBg } };
+    } else if (kind === 'result') {
+      a.font  = { bold: true, size: 10, name: 'Arial', color: { argb: C.greenText } };
+      a.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.greenBg } };
+    } else if (kind === 'final') {
+      a.font  = { bold: true, size: 11, name: 'Arial', color: { argb: C.headerText } };
+      a.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.headerBg } };
+    } else {
+      a.font  = { size: 10, name: 'Arial', color: { argb: C.darkGray } };
+      a.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: off % 2 === 0 ? C.altRow : 'FFFFFFFF' } };
+    }
+    a.alignment = { vertical: 'middle', wrapText: true };
   });
 
-  // Linha de referência para o resultado final não ser undefined
+  // ── Month columns B–M ────────────────────────────────────────────────────
+  const rReceita12   = dataStartRow + OFF_RECEITA;
+  const rCusto12     = dataStartRow + OFF_CUSTO;
+  const rTaxas12     = dataStartRow + OFF_TAXAS;
+  const rFrete12     = dataStartRow + OFF_FRETE;
+  const rSobra12     = dataStartRow + OFF_SOBRA;
+  const rGastos12    = dataStartRow + OFF_GASTOS;
+  const rProlabore12 = dataStartRow + OFF_PROLABORE12;
+  const rResultOp12  = dataStartRow + OFF_RESULT_OP;
+  const rEquip12     = dataStartRow + OFF_EQUIP;
+  const rReforma12   = dataStartRow + OFF_REFORMA;
+  const rEstoque12   = dataStartRow + OFF_ESTOQUE;
+  const rTotalInv12  = dataStartRow + OFF_TOTAL_INV;
+  const rParcEmp12   = dataStartRow + OFF_PARC_EMP;
+  const rParcMaq12   = dataStartRow + OFF_PARC_MAQ;
+  const rDinEmp12    = dataStartRow + OFF_DIN_EMP;
+  const rSaldoFin12  = dataStartRow + OFF_SALDO_FIN;
+  const rResFinal12  = dataStartRow + OFF_RESULT_FINAL;
+
+  months.forEach((_, mi) => {
+    const col = String.fromCharCode('B'.charCodeAt(0) + mi);
+    const isM1 = mi === 0;
+
+    // Section header cells — styled, no values
+    [dataStartRow + OFF_OP_HDR, dataStartRow + OFF_INV_HDR, dataStartRow + OFF_FIN_HDR].forEach(r => {
+      const c = fluxo.getCell(`${col}${r}`);
+      c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.headerBg } };
+    });
+
+    // (+) Receita de Vendas — yellow input, Month 1 pre-filled
+    const cRec = fluxo.getCell(`${col}${rReceita12}`);
+    cRec.value = isM1 ? input.faturamento : null;
+    cRec.numFmt = 'R$ #,##0.00';
+    inputCell(cRec);
+    cRec.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Custo Mercadorias — formula
+    const cCusto12 = fluxo.getCell(`${col}${rCusto12}`);
+    cCusto12.value = { formula: `${col}${rReceita12}*${input.custoProductPercent / 100}` };
+    cCusto12.numFmt = 'R$ #,##0.00';
+    cCusto12.font = { size: 10, name: 'Arial' };
+    cCusto12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
+    cCusto12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Taxas e Impostos — formula
+    const cTaxas12 = fluxo.getCell(`${col}${rTaxas12}`);
+    cTaxas12.value = { formula: `${col}${rReceita12}*${input.taxaPercent / 100}` };
+    cTaxas12.numFmt = 'R$ #,##0.00';
+    cTaxas12.font = { size: 10, name: 'Arial' };
+    cTaxas12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+    cTaxas12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Frete — formula
+    const cFrete12 = fluxo.getCell(`${col}${rFrete12}`);
+    cFrete12.value = { formula: `${col}${rReceita12}*${input.fretePercentual / 100}` };
+    cFrete12.numFmt = 'R$ #,##0.00';
+    cFrete12.font = { size: 10, name: 'Arial' };
+    cFrete12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
+    cFrete12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (=) Sobra das Vendas — formula
+    const cSobra12 = fluxo.getCell(`${col}${rSobra12}`);
+    cSobra12.value = { formula: `${col}${rReceita12}-${col}${rCusto12}-${col}${rTaxas12}-${col}${rFrete12}` };
+    cSobra12.numFmt = 'R$ #,##0.00';
+    cSobra12.font = { bold: true, size: 10, name: 'Arial' };
+    cSobra12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.greenBg } };
+    cSobra12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Gastos Fixos — cross-sheet ref (total minus pró-labore)
+    const cGastos12 = fluxo.getCell(`${col}${rGastos12}`);
+    cGastos12.value = { formula: fGastosFixos };
+    cGastos12.numFmt = 'R$ #,##0.00';
+    cGastos12.font = { size: 10, name: 'Arial' };
+    cGastos12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
+    cGastos12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Pró-labore — cross-sheet ref
+    const cProlabore12 = fluxo.getCell(`${col}${rProlabore12}`);
+    cProlabore12.value = { formula: fProLaboreXS };
+    cProlabore12.numFmt = 'R$ #,##0.00';
+    cProlabore12.font = { size: 10, name: 'Arial' };
+    cProlabore12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+    cProlabore12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (=) Resultado Operação — formula
+    const cResOp12 = fluxo.getCell(`${col}${rResultOp12}`);
+    cResOp12.value = { formula: `${col}${rSobra12}-${col}${rGastos12}-${col}${rProlabore12}` };
+    cResOp12.numFmt = 'R$ #,##0.00';
+    cResOp12.font = { bold: true, size: 10, name: 'Arial' };
+    cResOp12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.greenBg } };
+    cResOp12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Equipamentos — yellow input
+    const cEquip12 = fluxo.getCell(`${col}${rEquip12}`);
+    cEquip12.value = isM1 ? 0 : null;
+    cEquip12.numFmt = 'R$ #,##0.00';
+    inputCell(cEquip12);
+    cEquip12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Reforma — yellow input
+    const cReforma12 = fluxo.getCell(`${col}${rReforma12}`);
+    cReforma12.value = isM1 ? 0 : null;
+    cReforma12.numFmt = 'R$ #,##0.00';
+    inputCell(cReforma12);
+    cReforma12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Estoque Extra — yellow input
+    const cEstoque12 = fluxo.getCell(`${col}${rEstoque12}`);
+    cEstoque12.value = isM1 ? 0 : null;
+    cEstoque12.numFmt = 'R$ #,##0.00';
+    inputCell(cEstoque12);
+    cEstoque12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (=) Total Investido — formula
+    const cTotInv12 = fluxo.getCell(`${col}${rTotalInv12}`);
+    cTotInv12.value = { formula: `${col}${rEquip12}+${col}${rReforma12}+${col}${rEstoque12}` };
+    cTotInv12.numFmt = 'R$ #,##0.00';
+    cTotInv12.font = { bold: true, size: 10, name: 'Arial' };
+    cTotInv12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
+    cTotInv12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Parcelas Empréstimo — yellow input
+    const cParcEmp12 = fluxo.getCell(`${col}${rParcEmp12}`);
+    cParcEmp12.value = isM1 ? 0 : null;
+    cParcEmp12.numFmt = 'R$ #,##0.00';
+    inputCell(cParcEmp12);
+    cParcEmp12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (-) Parcelas Máquinas — yellow input
+    const cParcMaq12 = fluxo.getCell(`${col}${rParcMaq12}`);
+    cParcMaq12.value = isM1 ? 0 : null;
+    cParcMaq12.numFmt = 'R$ #,##0.00';
+    inputCell(cParcMaq12);
+    cParcMaq12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (+) Dinheiro Emprestado — yellow input
+    const cDinEmp12 = fluxo.getCell(`${col}${rDinEmp12}`);
+    cDinEmp12.value = isM1 ? 0 : null;
+    cDinEmp12.numFmt = 'R$ #,##0.00';
+    inputCell(cDinEmp12);
+    cDinEmp12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (=) Saldo Financiamentos — formula
+    const cSaldoFin12 = fluxo.getCell(`${col}${rSaldoFin12}`);
+    cSaldoFin12.value = { formula: `${col}${rDinEmp12}-${col}${rParcEmp12}-${col}${rParcMaq12}` };
+    cSaldoFin12.numFmt = 'R$ #,##0.00';
+    cSaldoFin12.font = { bold: true, size: 10, name: 'Arial' };
+    cSaldoFin12.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.altRow } };
+    cSaldoFin12.alignment = { horizontal: 'right', vertical: 'middle' };
+
+    // (=) RESULTADO FINAL — formula (conditional formatting applied below)
+    const cResFinal = fluxo.getCell(`${col}${rResFinal12}`);
+    cResFinal.value = { formula: `${col}${rResultOp12}-${col}${rTotalInv12}+${col}${rSaldoFin12}` };
+    cResFinal.numFmt = 'R$ #,##0.00';
+    cResFinal.font  = { bold: true, size: 11, name: 'Arial', color: { argb: C.headerText } };
+    cResFinal.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.headerBg } };
+    cResFinal.alignment = { horizontal: 'right', vertical: 'middle' };
+  });
+
+  // Conditional formatting for RESULTADO FINAL row: green if ≥0, red if <0
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (fluxo as any).addConditionalFormatting({
+    ref: `B${rResFinal12}:M${rResFinal12}`,
+    rules: [
+      {
+        type: 'cellIs', operator: 'greaterThanOrEqual', formulae: ['0'], priority: 1,
+        style: {
+          fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: C.greenBg } },
+          font: { bold: true, name: 'Arial', color: { argb: C.greenText } },
+        },
+      },
+      {
+        type: 'cellIs', operator: 'lessThan', formulae: ['0'], priority: 2,
+        style: {
+          fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: C.redBg } },
+          font: { bold: true, name: 'Arial', color: { argb: C.redText } },
+        },
+      },
+    ],
+  });
+
   void rowResultFinal;
 
   // ══════════════════════════════════════════════════════════════════════════
