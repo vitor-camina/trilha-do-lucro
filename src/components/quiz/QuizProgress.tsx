@@ -1,6 +1,6 @@
 'use client';
 
-import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
 
 interface QuizProgressProps {
   current: number;
@@ -16,8 +16,21 @@ export function QuizProgress({ current, total }: QuizProgressProps) {
         <span className="text-sm text-gray-400">
           Pergunta {current + 1} de {total}
         </span>
+        <span className="text-sm font-semibold" style={{ color: '#1B5E20' }}>
+          {Math.round(percent)}%
+        </span>
       </div>
-      <Progress value={percent} className="h-1.5" />
+      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{
+            background: 'linear-gradient(90deg, #1B5E20 0%, #4CAF50 100%)',
+          }}
+          initial={{ width: 0 }}
+          animate={{ width: `${percent}%` }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        />
+      </div>
     </div>
   );
 }

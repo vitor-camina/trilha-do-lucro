@@ -53,17 +53,29 @@ export function Benefits() {
           {benefits.map((benefit, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ delay: i * 0.08, duration: 0.45 }}
+              whileHover={{ y: -4, boxShadow: '0 8px 24px rgba(27,94,32,0.12)' }}
+              className="bg-white rounded-2xl p-6 border border-gray-100 cursor-default"
+              style={{
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                transition: 'box-shadow 0.2s ease',
+              }}
             >
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: '#E8F5E9' }}>
-                <benefit.icon className="w-6 h-6" style={{ color: '#1B5E20' }} />
+              <div className="flex items-start gap-4">
+                <div
+                  className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+                  style={{ backgroundColor: '#E8F5E9' }}
+                >
+                  <benefit.icon className="w-6 h-6" style={{ color: '#1B5E20' }} />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1 leading-snug">{benefit.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{benefit.description}</p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{benefit.description}</p>
             </motion.div>
           ))}
         </div>

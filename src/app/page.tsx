@@ -40,7 +40,7 @@ export default function Home() {
 
       {/* Footer simples */}
       <footer className="bg-gray-900 text-gray-400 py-8 px-6 text-center text-sm">
-        <p>&copy; {new Date().getFullYear()} Raio-X do Negócio. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Trilha do Lucro. Todos os direitos reservados.</p>
       </footer>
     </main>
   );
