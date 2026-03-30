@@ -16,58 +16,13 @@ const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '37,00';
 const PRICE_ORIGINAL = '197,00';
 
 const DELIVERABLES = [
-  {
-    benefit: 'Descubra exatamente quanto cobrar em cada produto para nunca mais vender no prejuízo',
-    tag: 'Precificação',
-  },
-  {
-    benefit: 'Saiba quais produtos dão lucro e quais estão sugando sua margem em silêncio',
-    tag: 'Curva ABC',
-  },
-  {
-    benefit: 'Simule cenários reais: quanto precisa faturar para contratar, expandir ou sobreviver',
-    tag: 'Simulador',
-  },
-  {
-    benefit: 'Veja sua margem real de lucro — o número que seu contador provavelmente não te mostra',
-    tag: 'Margem Real',
-  },
-  {
-    benefit: 'Saiba o mínimo que precisa faturar para não fechar o mês no vermelho',
-    tag: 'Ponto de Equilíbrio',
-  },
-  {
-    benefit: 'Descubra o faturamento exato para pagar todas as contas e ainda se pagar direito',
-    tag: 'Faturamento Ideal',
-  },
-  {
-    benefit: 'Relatório completo em PDF para guardar, compartilhar ou apresentar a investidores',
-    tag: 'Relatório PDF',
-  },
-  {
-    benefit: 'Planilha de controle financeiro pronta para usar nos próximos 12 meses',
-    tag: 'Planilha 12 Meses',
-  },
-  {
-    benefit: 'Recomendações personalizadas baseadas no perfil real do seu negócio',
-    tag: 'Insights',
-  },
-  {
-    benefit: 'Planejamento estratégico completo: missão, visão, valores e propósito da sua loja',
-    tag: 'Estratégia',
-  },
-  {
-    benefit: 'Análise SWOT guiada para enxergar suas forças, fraquezas, oportunidades e ameaças',
-    tag: 'SWOT',
-  },
-  {
-    benefit: 'Seus 5 maiores movimentos estratégicos com base nos cruzamentos do SWOT',
-    tag: 'Cruzamentos',
-  },
-  {
-    benefit: 'Plano de ação personalizado para os próximos 30, 60 e 90 dias',
-    tag: 'Plano de Ação',
-  },
+  { benefit: 'Planilha completa com 6 abas prontas pra usar — pré-preenchida com seus dados reais', tag: 'Planilha Guiada' },
+  { benefit: 'Saiba exatamente quanto precisa vender por dia, semana e mês pra cobrir todas as contas', tag: 'Meta de Vendas' },
+  { benefit: 'Lista guiada de gastos fixos — identifique onde está sangrando dinheiro todo mês', tag: 'Gastos Fixos' },
+  { benefit: 'Calculadora de preço com margens sugeridas pro seu tipo de loja — nunca mais venda no prejuízo', tag: 'Formação de Preço' },
+  { benefit: 'Controle mensal completo — veja se o problema é na operação, nos investimentos ou nos financiamentos', tag: 'Meu Dinheiro no Mês' },
+  { benefit: 'Plano de ação 30/60/90 dias com checklist passo a passo pra colocar em prática hoje', tag: 'Plano de Ação' },
+  { benefit: 'Relatório PDF Raio-X Financeiro completo para imprimir, guardar e consultar quando precisar', tag: 'Relatório PDF' },
 ];
 
 export function PaywallScreen({ onUnlock, hotmartUrl, input, result }: PaywallScreenProps) {
