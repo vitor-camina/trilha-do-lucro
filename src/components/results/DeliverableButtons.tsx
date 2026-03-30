@@ -29,8 +29,8 @@ export function DeliverableButtons({
   async function handleDownloadPdf() {
     setLoadingPdf(true);
     try {
-      const { generateReport } = await import('@/lib/pdf/generate-report');
-      await generateReport(input, result, classification, insights, businessName);
+      const { generatePDF } = await import('@/lib/pdf/generate-pdf');
+      await generatePDF(input, result, classification, businessName);
     } catch (err) {
       console.error('Erro ao gerar PDF:', err);
     } finally {
