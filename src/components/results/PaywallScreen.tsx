@@ -25,7 +25,7 @@ const DELIVERABLES = [
   { benefit: 'Relatório PDF Raio-X Financeiro completo para imprimir, guardar e consultar quando precisar', tag: 'Relatório PDF' },
 ];
 
-export function PaywallScreen({ onUnlock, hotmartUrl, input, result }: PaywallScreenProps) {
+export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps) {
   const [email, setEmail] = useState('');
 
   const margem = result?.margemLiquida ?? 0;
@@ -220,14 +220,14 @@ export function PaywallScreen({ onUnlock, hotmartUrl, input, result }: PaywallSc
             </div>
           </div>
 
-          {/* Link "já paguei" */}
+          {/* Link "já paguei" — redireciona para suporte; acesso real vem via ?acesso=liberado no e-mail */}
           <button
             type="button"
-            onClick={onUnlock}
+            onClick={() => window.open('https://app.hotmart.com/products/purchased', '_blank')}
             className="w-full text-sm text-center py-1 underline underline-offset-2"
             style={{ color: '#1B5E20' }}
           >
-            Já paguei — liberar meu acesso
+            Já paguei — acessar minha compra
           </button>
 
         </div>

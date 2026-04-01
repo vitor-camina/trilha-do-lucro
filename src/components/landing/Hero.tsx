@@ -81,10 +81,10 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
-          className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6"
+          className="text-3xl md:text-5xl font-bold text-white leading-tight mb-6"
         >
           Você sabe se sua loja está{' '}
-          <span className="relative inline-block whitespace-nowrap">
+          <span className="relative inline-block whitespace-normal md:whitespace-nowrap">
             <span style={{ color: '#F9A825' }}>lucrando de verdade?</span>
             <motion.span
               initial={{ scaleX: 0 }}
