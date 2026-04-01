@@ -2,6 +2,14 @@ import type { DiagnosticInput, DiagnosticResult, BusinessClassification } from '
 import { formatBRL } from '@/lib/formatters';
 import { downloadBlob } from '@/lib/download';
 
+// ─── Character normalization (jsPDF built-in fonts don't support Latin extended) ──
+function nt(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ç/g, 'c').replace(/Ç/g, 'C');
+}
+
 // ─── Brand Colors ────────────────────────────────────────────────────────────
 const VERDE  = { r: 27,  g: 94,  b: 32  };   // #1B5E20
 const VERDE_LIGHT = { r: 200, g: 230, b: 201 }; // #C8E6C9
@@ -41,41 +49,41 @@ function getRecommendations(level: string): string[] {
   switch (level) {
     case 'prejuizo':
       return [
-        '🔴 Revise urgentemente seus preços — sua margem atual não cobre os custos.',
-        '🔴 Liste todos os custos fixos e corte os não essenciais imediatamente.',
+        '🔴 Revise urgentemente seus precos - sua margem atual nao cobre os custos.',
+        '🔴 Liste todos os custos fixos e corte os nao essenciais imediatamente.',
         '🔴 Negocie prazos com fornecedores para aliviar o fluxo de caixa.',
-        '🔴 Defina um prazo claro (30 dias) para reavaliar a viabilidade do negócio.',
+        '🔴 Defina um prazo claro (30 dias) para reavaliar a viabilidade do negocio.',
       ];
     case 'sobrevivendo':
       return [
-        '🟠 Aumente o ticket médio com combos ou produtos complementares.',
-        '🟠 Revise o preço dos 3 produtos mais vendidos — há espaço para ajuste.',
-        '🟠 Reduza custos variáveis: negocie frete e taxas de cartão.',
-        '🟠 Meta nos próximos 60 dias: atingir o ponto de equilíbrio.',
+        '🟠 Aumente o ticket medio com combos ou produtos complementares.',
+        '🟠 Revise o preco dos 3 produtos mais vendidos - ha espaco para ajuste.',
+        '🟠 Reduza custos variaveis: negocie frete e taxas de cartao.',
+        '🟠 Meta nos proximos 60 dias: atingir o ponto de equilibrio.',
       ];
     case 'estavel':
       return [
-        '🟡 Você está estável — mas estabilidade não é crescimento.',
-        '🟡 Invista em marketing de baixo custo: redes sociais e indicações.',
-        '🟡 Crie um programa de fidelidade simples para aumentar a recorrência.',
-        '🟡 Separe uma reserva de emergência equivalente a 2 meses de custos fixos.',
+        '🟡 Voce esta estavel - mas estabilidade nao e crescimento.',
+        '🟡 Invista em marketing de baixo custo: redes sociais e indicacoes.',
+        '🟡 Crie um programa de fidelidade simples para aumentar a recorrencia.',
+        '🟡 Separe uma reserva de emergencia equivalente a 2 meses de custos fixos.',
       ];
     case 'saudavel':
       return [
-        '🟢 Negócio saudável! Hora de escalar com mais consistência.',
+        '🟢 Negocio saudavel! Hora de escalar com mais consistencia.',
         '🟢 Documente seus processos para se preparar para crescimento.',
         '🟢 Explore novos canais de venda (marketplace, atacado, online).',
         '🟢 Reinvista parte do lucro em estoque e marketing.',
       ];
     case 'escalavel':
       return [
-        '✅ Parabéns — seu negócio tem base sólida para escalar.',
-        '✅ Considere contratar um colaborador para escalar as operações.',
-        '✅ Busque parcerias estratégicas para ampliar distribuição.',
+        '✅ Parabens - seu negocio tem base solida para escalar.',
+        '✅ Considere contratar um colaborador para escalar as operacoes.',
+        '✅ Busque parcerias estrategicas para ampliar distribuicao.',
         '✅ Automatize processos repetitivos para liberar seu tempo.',
       ];
     default:
-      return ['Analise suas métricas e trace um plano de ação para o próximo mês.'];
+      return ['Analise suas metricas e trace um plano de acao para o proximo mes.'];
   }
 }
 
@@ -84,18 +92,18 @@ function getDiagnosis(result: DiagnosticResult, input: DiagnosticInput, level: s
   const faltaParaIdeal = result.faturamentoNecessario - input.faturamento;
 
   if (level === 'prejuizo') {
-    return `Com o faturamento atual de ${formatBRL(input.faturamento)}, sua loja está operando com prejuízo de ${formatBRL(Math.abs(result.lucroReal))} por mês. Isso significa que você precisa aumentar o faturamento em ${faltaParaEquilibrio > 0 ? formatBRL(faltaParaEquilibrio) : 'valores significativos'} só para cobrir os custos básicos, sem contar seu pró-labore. É urgente revisar preços e cortar gastos.`;
+    return `Com o faturamento atual de ${formatBRL(input.faturamento)}, sua loja esta operando com prejuizo de ${formatBRL(Math.abs(result.lucroReal))} por mes. Isso significa que voce precisa aumentar o faturamento em ${faltaParaEquilibrio > 0 ? formatBRL(faltaParaEquilibrio) : 'valores significativos'} so para cobrir os custos basicos, sem contar seu pro-labore. E urgente revisar precos e cortar gastos.`;
   }
   if (level === 'sobrevivendo') {
-    return `Sua loja paga as contas, mas ainda não gera lucro real. Faltam ${faltaParaIdeal > 0 ? formatBRL(faltaParaIdeal) : 'R$ 0'} de faturamento para você cobrir tudo, incluindo o seu salário de ${formatBRL(input.proLabore)}. Com ajustes estratégicos de preço e redução de custos, você pode virar o jogo em 60 dias.`;
+    return `Sua loja paga as contas, mas ainda nao gera lucro real. Faltam ${faltaParaIdeal > 0 ? formatBRL(faltaParaIdeal) : 'R$ 0'} de faturamento para voce cobrir tudo, incluindo o seu salario de ${formatBRL(input.proLabore)}. Com ajustes estrategicos de preco e reducao de custos, voce pode virar o jogo em 60 dias.`;
   }
   if (level === 'estavel') {
-    return `Você atingiu o ponto de equilíbrio e gera uma margem de ${result.margemLiquida.toFixed(1)}%. O lucro real de ${formatBRL(result.lucroReal)} por mês é o início — mas ainda há espaço para crescer. Foque em aumentar o ticket médio e fidelizar seus clientes.`;
+    return `Voce atingiu o ponto de equilibrio e gera uma margem de ${result.margemLiquida.toFixed(1)}%. O lucro real de ${formatBRL(result.lucroReal)} por mes e o inicio - mas ainda ha espaco para crescer. Foque em aumentar o ticket medio e fidelizar seus clientes.`;
   }
   if (level === 'saudavel') {
-    return `Ótimo trabalho! Com margem líquida de ${result.margemLiquida.toFixed(1)}% e lucro real de ${formatBRL(result.lucroReal)} por mês, seu negócio está saudável. Você está acima do ponto de equilíbrio e tem base para investir no crescimento.`;
+    return `Otimo trabalho! Com margem liquida de ${result.margemLiquida.toFixed(1)}% e lucro real de ${formatBRL(result.lucroReal)} por mes, seu negocio esta saudavel. Voce esta acima do ponto de equilibrio e tem base para investir no crescimento.`;
   }
-  return `Sua loja opera com excelência: margem líquida de ${result.margemLiquida.toFixed(1)}% e lucro real de ${formatBRL(result.lucroReal)} ao mês. Você tem fôlego financeiro para escalar. Continue monitorando os indicadores e busque novas oportunidades de crescimento.`;
+  return `Sua loja opera com excelencia: margem liquida de ${result.margemLiquida.toFixed(1)}% e lucro real de ${formatBRL(result.lucroReal)} ao mes. Voce tem folego financeiro para escalar. Continue monitorando os indicadores e busque novas oportunidades de crescimento.`;
 }
 
 // ─── Main export ─────────────────────────────────────────────────────────────
@@ -143,24 +151,24 @@ export async function generatePDF(
   setTextC(doc, WHITE);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('Raio-X Financeiro', iconX + 12, 17);
+  doc.text(nt('Raio-X Financeiro'), iconX + 12, 17);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   setTextC(doc, OURO);
-  doc.text('Trilha do Lucro', iconX + 12, 24);
+  doc.text(nt('Trilha do Lucro'), iconX + 12, 24);
 
   // Date right-aligned
   const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   doc.setFontSize(8);
   setTextC(doc, { r: 200, g: 230, b: 200 });
-  doc.text(today, pageW - margin, 20, { align: 'right' });
+  doc.text(nt(today), pageW - margin, 20, { align: 'right' });
 
   // Business name right-aligned
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   setTextC(doc, WHITE);
-  doc.text(businessName || 'Meu Negócio', pageW - margin, 27, { align: 'right' });
+  doc.text(nt(businessName || 'Meu Negocio'), pageW - margin, 27, { align: 'right' });
 
   y = 52;
 
@@ -179,12 +187,12 @@ export async function generatePDF(
   doc.setFontSize(17);
   doc.setFont('helvetica', 'bold');
   setTextC(doc, classColor);
-  doc.text(`${classification.emoji}  ${classification.label}`, pageW / 2, y + 10, { align: 'center' });
+  doc.text(nt(`${classification.emoji}  ${classification.label}`), pageW / 2, y + 10, { align: 'center' });
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   setTextC(doc, GRAY_MID);
-  doc.text(classification.description, pageW / 2, y + 19, { align: 'center', maxWidth: cw - 10 });
+  doc.text(nt(classification.description), pageW / 2, y + 19, { align: 'center', maxWidth: cw - 10 });
 
   y += 34;
 
@@ -195,10 +203,10 @@ export async function generatePDF(
   doc.setFont('helvetica', 'bold');
   if (result.lucroReal >= 0) {
     setTextC(doc, VERDE);
-    doc.text(`Lucro real: ${formatBRL(result.lucroReal)} / mês`, pageW / 2, y, { align: 'center' });
+    doc.text(nt(`Lucro real: ${formatBRL(result.lucroReal)} / mes`), pageW / 2, y, { align: 'center' });
   } else {
     setTextC(doc, RED);
-    doc.text(`Prejuízo: ${formatBRL(Math.abs(result.lucroReal))} / mês`, pageW / 2, y, { align: 'center' });
+    doc.text(nt(`Prejuizo: ${formatBRL(Math.abs(result.lucroReal))} / mes`), pageW / 2, y, { align: 'center' });
   }
   setTextC(doc, GRAY_DARK);
   y += 12;
@@ -210,14 +218,14 @@ export async function generatePDF(
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     setTextC(doc, VERDE);
-    doc.text(title, margin, y);
+    doc.text(nt(title), margin, y);
     doc.setLineWidth(0.3);
     setDrawC(doc, VERDE);
     doc.line(margin, y + 1.5, margin + cw, y + 1.5);
     y += 7;
   };
 
-  sectionTitle('Métricas principais');
+  sectionTitle('Metricas principais');
 
   const margemFormatted = `${result.margemLiquida.toFixed(1)}%`;
   const peFormatted = result.pontoEquilibrio === Infinity ? 'Inviável' : formatBRL(result.pontoEquilibrio);
@@ -226,10 +234,10 @@ export async function generatePDF(
 
   const metricsData: [string, string, string, string][] = [
     ['Faturamento mensal',          formatBRL(input.faturamento),   'Custo do produto',    `${input.custoProductPercent}%`],
-    ['Custos fixos mensais',         formatBRL(input.custosFixos),   'Taxas (cartão/mkt)',  `${input.taxaPercent}%`],
-    ['Pró-labore desejado',          formatBRL(input.proLabore),     'Frete',               `${input.fretePercentual}%`],
-    ['Ponto de equilíbrio',          peFormatted,                    'Faturamento ideal',   fatNecFormatted],
-    ['Margem líquida',               margemFormatted,                'Sobra real no caixa', sobraFormatted],
+    ['Custos fixos mensais',         formatBRL(input.custosFixos),   'Taxas (cartao/mkt)',  `${input.taxaPercent}%`],
+    ['Pro-labore desejado',          formatBRL(input.proLabore),     'Frete',               `${input.fretePercentual}%`],
+    ['Ponto de equilibrio',          peFormatted,                    'Faturamento ideal',   fatNecFormatted],
+    ['Margem liquida',               margemFormatted,                'Sobra real no caixa', sobraFormatted],
   ];
 
   autoTable(doc, {
@@ -253,7 +261,7 @@ export async function generatePDF(
   // ═══════════════════════════════════════════════════════════════
   // MARGIN HEALTH BAR
   // ═══════════════════════════════════════════════════════════════
-  sectionTitle('Saúde da margem');
+  sectionTitle('Saude da margem');
 
   const barY = y;
   const barH = 10;
@@ -312,13 +320,13 @@ export async function generatePDF(
   // ═══════════════════════════════════════════════════════════════
   // DIAGNOSIS TEXT
   // ═══════════════════════════════════════════════════════════════
-  sectionTitle('Diagnóstico');
+  sectionTitle('Diagnostico');
 
   const diagnosis = getDiagnosis(result, input, classification.level);
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'normal');
   setTextC(doc, GRAY_DARK);
-  const diagLines = doc.splitTextToSize(diagnosis, cw);
+  const diagLines = doc.splitTextToSize(nt(diagnosis), cw);
   doc.text(diagLines, margin, y);
   y += diagLines.length * 5 + 10;
 
@@ -331,7 +339,7 @@ export async function generatePDF(
     y = margin + 5;
   }
 
-  sectionTitle('Plano de ação');
+  sectionTitle('Plano de acao');
 
   const recs = getRecommendations(classification.level);
   for (const rec of recs) {
@@ -341,7 +349,7 @@ export async function generatePDF(
     }
 
     // Pill background
-    const recLines = doc.splitTextToSize(rec, cw - 8);
+    const recLines = doc.splitTextToSize(nt(rec), cw - 8);
     const pillH = recLines.length * 5 + 6;
 
     setFill(doc, GRAY_LIGHT);
@@ -371,12 +379,12 @@ export async function generatePDF(
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   setTextC(doc, { r: 120, g: 70, b: 0 });
-  doc.text('Próximo passo', margin + 6, y + 8);
+  doc.text('Proximo passo', margin + 6, y + 8);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   setTextC(doc, { r: 90, g: 60, b: 0 });
-  const nextStep = 'Abra a planilha de controle financeiro (incluída no pacote) e registre suas movimentações mensais. Quanto mais dados você tiver, mais preciso será o seu diagnóstico.';
+  const nextStep = 'Abra a planilha de controle financeiro (incluida no pacote) e registre suas movimentacoes mensais. Quanto mais dados voce tiver, mais preciso sera o seu diagnostico.';
   const ctaLines = doc.splitTextToSize(nextStep, cw - 12);
   doc.text(ctaLines, margin + 6, y + 15);
 
@@ -393,9 +401,9 @@ export async function generatePDF(
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     setTextC(doc, { r: 200, g: 230, b: 200 });
-    doc.text('Gerado pela Trilha do Lucro — trilhadolucro.com.br', margin, pageH - 5.5);
+    doc.text('Gerado pela Trilha do Lucro - trilhadolucro.com.br', margin, pageH - 5.5);
     setTextC(doc, { r: 200, g: 230, b: 200 });
-    doc.text(`Página ${i} de ${totalPages}`, pageW - margin, pageH - 5.5, { align: 'right' });
+    doc.text(`Pagina ${i} de ${totalPages}`, pageW - margin, pageH - 5.5, { align: 'right' });
   }
 
   // ─── Download ────────────────────────────────────────────────────────────────
