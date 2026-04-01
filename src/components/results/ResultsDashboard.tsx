@@ -255,20 +255,15 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </div>
       </motion.div>
 
-      {/* PAYWALL ou conteúdo pago */}
-      {!isPaid ? (
-        <div className="mt-4">
-          <PaywallScreen
-            onUnlock={handleUnlock}
-            hotmartUrl={HOTMART_CHECKOUT_URL}
-            input={input}
-            result={result}
-          />
-        </div>
-      ) : (
-        <>
+      {/* PAYWALL + conteúdo pago — conteúdo sempre renderizado; borrado quando não pago */}
+      <div className="relative mt-4">
+        {/* Paid content — blurred and non-interactive for non-paid users */}
+        <div
+          style={!isPaid ? { filter: 'blur(8px)', pointerEvents: 'none', userSelect: 'none' } : undefined}
+          aria-hidden={!isPaid || undefined}
+        >
           {/* Métricas detalhadas — PAGO */}
-          <div className="px-4 mt-4 space-y-3">
+          <div className="px-4 space-y-3">
             <MetricCard
               label="Quanto sobra de verdade"
               value={formatBRL(result.lucroReal)}
@@ -321,14 +316,14 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
           </div>
 
           {/* Checklist 30/60/90 — PAGO */}
-          {showChecklist && (
+          {showChecklist && isPaid && (
             <div className="px-4 mt-4">
               <ActionChecklist level={classification.level} />
             </div>
           )}
 
           {/* ─── Análise Estratégica ─────────────────────────────────────── */}
-          {paidStep === 'financial' && (
+          {isPaid && paidStep === 'financial' && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -363,7 +358,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
           )}
 
           {/* Resultado da estratégia gerada */}
-          {paidStep === 'strategy' && (strategy || purposeAnswers.q1) && (
+          {isPaid && paidStep === 'strategy' && (strategy || purposeAnswers.q1) && (
             <StrategyResult
               strategy={strategy ?? generateStrategy(purposeAnswers)}
               swotAnswers={swotAnswers}
@@ -371,8 +366,20 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
               onRedo={() => goToStep('purpose')}
             />
           )}
-        </>
-      )}
+        </div>
+
+        {/* PaywallScreen overlay — absolutely positioned on top of blurred content */}
+        {!isPaid && (
+          <div className="absolute inset-x-0 top-0 z-10">
+            <PaywallScreen
+              onUnlock={handleUnlock}
+              hotmartUrl={HOTMART_CHECKOUT_URL}
+              input={input}
+              result={result}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Botão refazer — sempre visível */}
       <div className="px-4 mt-8">
