@@ -220,7 +220,7 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
             </div>
           </div>
 
-          {/* Link "já paguei" — redireciona para suporte; acesso real vem via ?acesso=liberado no e-mail */}
+          {/* Link "já paguei" — redireciona para suporte; acesso real vem via ?acesso=TL2026x9k no e-mail */}
           <button
             type="button"
             onClick={() => window.open('https://app.hotmart.com/products/purchased', '_blank')}
