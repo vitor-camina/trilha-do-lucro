@@ -43,7 +43,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       return true;
     }
     if (sessionStorage.getItem('raiox_test_mode') === 'true') return true;
-    if (params.get('acesso') === 'liberado') return true;
+    if (params.get('acesso') === 'TL2026x9k') return true;
     if (localStorage.getItem('raiox_paid') === 'true') return true;
     return false;
   });
@@ -75,7 +75,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       return;
     }
     const params = new URLSearchParams(window.location.search);
-    if (params.get('acesso') === 'liberado') {
+    if (params.get('acesso') === 'TL2026x9k') {
       setIsPaid(true);
       localStorage.setItem('raiox_paid', 'true');
       window.history.replaceState({}, '', window.location.pathname);
