@@ -33,19 +33,20 @@ export function DeliverableButtons({
       await generatePDF(input, result, classification, businessName);
     } catch (err) {
       console.error('Erro ao gerar PDF:', err);
+      alert('Não foi possível gerar o PDF. Tente novamente ou use um computador.');
     } finally {
       setLoadingPdf(false);
     }
   }
 
   async function handleDownloadXlsx() {
-    console.log('Download started');
     setLoadingXlsx(true);
     try {
       const { generateSpreadsheet } = await import('@/lib/spreadsheet/generate-spreadsheet');
       await generateSpreadsheet(input, result, classification, businessName);
     } catch (err) {
-      console.error('Download error:', err);
+      console.error('Erro ao gerar planilha:', err);
+      alert('Não foi possível gerar a planilha. Tente novamente ou use um computador.');
     } finally {
       setLoadingXlsx(false);
     }
