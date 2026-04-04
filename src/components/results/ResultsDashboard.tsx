@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,8 +21,7 @@ import PurposeQuiz from '@/components/paid/PurposeQuiz';
 import SwotQuiz from '@/components/paid/SwotQuiz';
 import SwotCrossingComponent from '@/components/paid/SwotCrossing';
 
-// URL do checkout da Hotmart — substituir pela URL real do produto
-const HOTMART_CHECKOUT_URL = process.env.NEXT_PUBLIC_HOTMART_URL || 'https://hotmart.com/pt-br';
+const HOTMART_CHECKOUT_URL = process.env.NEXT_PUBLIC_HOTMART_URL || 'https://pay.hotmart.com/W105207264J';
 
 interface ResultsDashboardProps {
   input: DiagnosticInput;
@@ -38,18 +36,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   const [isPaid, setIsPaid] = useState(() => {
     if (typeof window === 'undefined') return false;
     const params = new URLSearchParams(window.location.search);
-    if (params.get('teste') === 'trilha2026') {
-      sessionStorage.setItem('raiox_test_mode', 'true');
-      return true;
-    }
-    if (sessionStorage.getItem('raiox_test_mode') === 'true') return true;
+    if (params.get('teste') === 'trilha2026') return true;
     if (params.get('acesso') === 'TL2026x9k') return true;
     if (localStorage.getItem('raiox_paid') === 'true') return true;
     return false;
   });
   const [showChecklist, setShowChecklist] = useState(false);
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
-  const searchParams = useSearchParams();
 
   const {
     paidStep,
@@ -62,27 +55,16 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     goToStep,
   } = useProgress(input);
 
-  // Verifica acesso pago (sincroniza se URL mudar após mount)
+  // Strip ?acesso=TL2026x9k from URL after granting access (runs once on mount)
   useEffect(() => {
-    if (isPaid) return;
-    if (searchParams.get('teste') === 'trilha2026') {
-      sessionStorage.setItem('raiox_test_mode', 'true');
-      setIsPaid(true);
-      return;
-    }
-    if (sessionStorage.getItem('raiox_test_mode') === 'true') {
-      setIsPaid(true);
-      return;
-    }
+    if (!isPaid) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get('acesso') === 'TL2026x9k') {
-      setIsPaid(true);
       localStorage.setItem('raiox_paid', 'true');
       window.history.replaceState({}, '', window.location.pathname);
-    } else if (localStorage.getItem('raiox_paid') === 'true') {
-      setIsPaid(true);
     }
-  }, [searchParams, isPaid]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleUnlock() {
     setIsPaid(true);
