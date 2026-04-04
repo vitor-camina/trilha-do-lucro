@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { RotateCcw, Sparkles } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type {
   DiagnosticInput, DiagnosticResult, BusinessClassification, Insight,
@@ -43,7 +43,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       return true;
     }
     if (sessionStorage.getItem('raiox_test_mode') === 'true') return true;
-    if (params.get('acesso') === 'liberado') return true;
+    if (params.get('acesso') === 'TL2026x9k') return true;
     if (localStorage.getItem('raiox_paid') === 'true') return true;
     return false;
   });
@@ -75,7 +75,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       return;
     }
     const params = new URLSearchParams(window.location.search);
-    if (params.get('acesso') === 'liberado') {
+    if (params.get('acesso') === 'TL2026x9k') {
       setIsPaid(true);
       localStorage.setItem('raiox_paid', 'true');
       window.history.replaceState({}, '', window.location.pathname);
@@ -320,41 +320,6 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             <div className="px-4 mt-4">
               <ActionChecklist level={classification.level} />
             </div>
-          )}
-
-          {/* ─── Análise Estratégica ─────────────────────────────────────── */}
-          {isPaid && paidStep === 'financial' && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mx-4 mt-6 rounded-2xl p-5"
-              style={{ border: '1px solid #C8E6C9', background: 'linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%)' }}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#1B5E20' }}>
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 text-base mb-1">
-                    Análise Estratégica completa
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                    Crie o propósito, missão, visão e valores da sua loja — e monte sua matriz SWOT com cruzamentos estratégicos personalizados.
-                  </p>
-                  <Button
-                    type="button"
-                    size="lg"
-                    onClick={() => goToStep('purpose')}
-                    className="w-full h-12 rounded-xl text-base font-semibold text-white"
-                    style={{ backgroundColor: '#1B5E20' }}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Iniciar análise estratégica
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
           )}
 
           {/* Resultado da estratégia gerada */}
