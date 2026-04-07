@@ -6,6 +6,67 @@ import { HowItWorks } from '@/components/landing/HowItWorks';
 import { Benefits } from '@/components/landing/Benefits';
 import { CTA } from '@/components/landing/CTA';
 
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Trilha do Lucro',
+  description: 'Diagnóstico financeiro para lojistas. Descubra em menos de 3 minutos se sua loja está lucrando de verdade.',
+  url: 'https://www.trilhadolucro.com.br',
+  offers: {
+    '@type': 'Offer',
+    price: '37.00',
+    priceCurrency: 'BRL',
+    availability: 'https://schema.org/InStock',
+  },
+};
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Trilha do Lucro',
+  url: 'https://www.trilhadolucro.com.br',
+  logo: 'https://www.trilhadolucro.com.br/og-image.png',
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'O diagnóstico funciona para que tipo de loja?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Funciona para qualquer loja física ou online — roupas, alimentos, eletrônicos, cosméticos, etc.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Preciso ser contador para usar?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Não! O diagnóstico foi feito para lojistas, não para contadores. Basta saber seus números básicos de faturamento e custos.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quanto tempo leva?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Menos de 3 minutos para preencher e receber seu resultado completo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Funciona no celular?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sim, funciona perfeitamente em qualquer dispositivo.',
+      },
+    },
+  ],
+};
+
 export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -16,6 +77,18 @@ export default function Home() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Header Trilha do Lucro */}
       <header className="flex items-center justify-center py-4 px-6" style={{ backgroundColor: '#1B5E20' }}>
         <div className="flex items-center gap-3">

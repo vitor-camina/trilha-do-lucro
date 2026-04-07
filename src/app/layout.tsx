@@ -18,13 +18,36 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.trilhadolucro.com.br'),
   title: "Trilha do Lucro | Descubra se sua loja está lucrando de verdade",
   description: "Faça o diagnóstico financeiro da sua loja em menos de 3 minutos. Descubra se está lucrando, quanto precisa vender e o que fazer para crescer.",
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: "Trilha do Lucro | Diagnóstico financeiro para lojistas",
     description: "Descubra em 3 minutos se sua loja está lucrando de verdade. Grátis.",
     type: "website",
     locale: "pt_BR",
+    url: 'https://www.trilhadolucro.com.br',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Trilha do Lucro — Diagnóstico financeiro para lojistas',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Trilha do Lucro | Diagnóstico financeiro para lojistas",
+    description: "Descubra em 3 minutos se sua loja está lucrando de verdade. Grátis.",
+    images: ['/og-image.png'],
   },
 };
 
