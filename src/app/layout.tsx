@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
+import { UTMCapture } from "@/components/UTMCapture";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,6 +62,7 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${inter.variable} ${montserrat.variable} antialiased`}>
       <body className="font-sans bg-brand-bg text-brand-dark">
         {children}
+        <UTMCapture />
         <Analytics />
         <SpeedInsights />
         <Script
@@ -75,6 +77,22 @@ export default function RootLayout({
             gtag('config', 'G-JG3YNYBKVT');
           `}
         </Script>
+        {/* META PIXEL — uncomment and replace PIXEL_ID_HERE with your Pixel ID once available
+        <Script id="meta-pixel" strategy="afterInteractive">
+          {`
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', 'PIXEL_ID_HERE');
+            fbq('track', 'PageView');
+          `}
+        </Script>
+        */}
       </body>
     </html>
   );

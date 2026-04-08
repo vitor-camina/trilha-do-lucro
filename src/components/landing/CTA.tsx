@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackCtaClick } from '@/lib/tracking';
 
 export function CTA() {
   return (
@@ -21,7 +22,7 @@ export function CTA() {
           48% das empresas fecham por falta de controle financeiro.
           Não deixe a sua ser uma delas.
         </p>
-        <Link href="/diagnostico">
+        <Link href="/diagnostico" onClick={() => trackCtaClick('Fazer meu diagnóstico grátis', 'cta')}>
           <Button
             size="lg"
             className="h-14 px-8 rounded-xl text-lg font-semibold shadow-lg" style={{ background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)', color: '#1B5E20' }}

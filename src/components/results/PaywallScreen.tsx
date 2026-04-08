@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import type { DiagnosticInput, DiagnosticResult } from '@/types';
+import { trackCtaClick, trackBeginCheckout } from '@/lib/tracking';
+import { appendUtms } from '@/lib/utm';
 
 interface PaywallScreenProps {
   onUnlock: () => void;
@@ -50,7 +52,9 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
         // silently fail
       }
     }
-    window.open(hotmartUrl, '_blank');
+    trackCtaClick('DESBLOQUEAR MINHA ANÁLISE COMPLETA', 'paywall');
+    trackBeginCheckout();
+    window.open(appendUtms(hotmartUrl), '_blank');
   }
 
   return (

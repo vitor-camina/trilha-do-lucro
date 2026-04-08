@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackCtaClick } from '@/lib/tracking';
 
 export function Hero() {
   return (
@@ -114,7 +115,7 @@ export function Hero() {
           transition={{ delay: 0.34 }}
           className="flex flex-col items-center gap-3"
         >
-          <Link href="/diagnostico">
+          <Link href="/diagnostico" onClick={() => trackCtaClick('Fazer meu diagnóstico grátis', 'hero')}>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <Button
                 size="lg"
