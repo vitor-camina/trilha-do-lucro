@@ -77,7 +77,6 @@ export default function RootLayout({
             gtag('config', 'G-JG3YNYBKVT');
           `}
         </Script>
-        {/* META PIXEL — uncomment and replace PIXEL_ID_HERE with your Pixel ID once available
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -88,11 +87,10 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', 'PIXEL_ID_HERE');
+            fbq('init', '1759395398372894');
             fbq('track', 'PageView');
           `}
         </Script>
-        */}
       </body>
     </html>
   );
