@@ -1,9 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useDiagnostic } from '@/hooks/useDiagnostic';
 import { QuizContainer } from '@/components/quiz/QuizContainer';
 import { LoadingScreen } from '@/components/quiz/LoadingScreen';
 import { ResultsDashboard } from '@/components/results/ResultsDashboard';
+import { PaymentConfirmedBanner } from '@/components/diagnostico/PaymentConfirmedBanner';
 
 export default function DiagnosticoPage() {
   const {
@@ -16,6 +18,14 @@ export default function DiagnosticoPage() {
     submitDiagnostic,
     restart,
   } = useDiagnostic();
+
+  // Detecta retorno pós-pagamento do Hotmart via ?acesso=TL2026x9k.
+  // useEffect evita hydration mismatch (window indisponível no servidor).
+  const [showPaymentBanner, setShowPaymentBanner] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowPaymentBanner(params.get('acesso') === 'TL2026x9k');
+  }, []);
 
   if (phase === 'loading') {
     return <LoadingScreen />;
@@ -34,10 +44,13 @@ export default function DiagnosticoPage() {
   }
 
   return (
-    <QuizContainer
-      input={input}
-      onUpdateField={updateField}
-      onSubmit={submitDiagnostic}
-    />
+    <>
+      <PaymentConfirmedBanner show={showPaymentBanner} />
+      <QuizContainer
+        input={input}
+        onUpdateField={updateField}
+        onSubmit={submitDiagnostic}
+      />
+    </>
   );
 }
