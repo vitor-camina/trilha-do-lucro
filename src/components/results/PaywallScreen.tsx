@@ -14,8 +14,8 @@ interface PaywallScreenProps {
   result?: DiagnosticResult;
 }
 
-const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '37,00';
-const PRICE_ORIGINAL = '197,00';
+const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '27,00';
+const PRICE_ORIGINAL = '37,00';
 
 const DELIVERABLES = [
   { benefit: 'Planilha completa com 6 abas prontas pra usar — pré-preenchida com seus dados reais', tag: 'Planilha Guiada' },
@@ -54,7 +54,7 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
     }
     trackCtaClick('DESBLOQUEAR MINHA ANÁLISE COMPLETA', 'paywall');
     trackBeginCheckout();
-    window.open(appendUtms(hotmartUrl), '_blank');
+    window.open(appendUtms(hotmartUrl), '_blank', 'noopener,noreferrer');
   }
 
   return (

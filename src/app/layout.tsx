@@ -91,6 +91,16 @@ export default function RootLayout({
             fbq('track', 'PageView');
           `}
         </Script>
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            src="https://www.facebook.com/tr?id=1759395398372894&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
       </body>
     </html>
   );

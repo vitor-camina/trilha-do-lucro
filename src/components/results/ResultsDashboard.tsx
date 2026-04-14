@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type {
   DiagnosticInput, DiagnosticResult, BusinessClassification, Insight,
   PurposeAnswers, SwotAnswers, SwotCrossing, GeneratedStrategy,
 } from '@/types';
 import { formatBRL, formatPercent } from '@/lib/formatters';
+import { trackBeginCheckout } from '@/lib/tracking';
+import { appendUtms } from '@/lib/utm';
 import { generateStrategy } from '@/lib/strategy-generator';
 import { useProgress } from '@/hooks/useProgress';
 import { BusinessClassBadge } from './BusinessClassBadge';
@@ -43,6 +45,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   });
   const [showChecklist, setShowChecklist] = useState(false);
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState(HOTMART_CHECKOUT_URL);
 
   const {
     paidStep,
@@ -64,6 +67,11 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       window.history.replaceState({}, '', window.location.pathname);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Computa URL do Hotmart com UTMs capturados (sessionStorage) no cliente
+  useEffect(() => {
+    setCheckoutUrl(appendUtms(HOTMART_CHECKOUT_URL));
   }, []);
 
   function handleUnlock() {
@@ -236,6 +244,110 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
           </div>
         </div>
       </motion.div>
+
+      {/* ═══ Blocos de clareza + conversão — visíveis SEM scroll, só quando !isPaid ═══ */}
+      {!isPaid && (
+        <>
+          {/* O que vem no Trilha do Lucro */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5"
+          >
+            <h3
+              className="text-sm font-semibold uppercase tracking-wide mb-3"
+              style={{ color: '#1B5E20' }}
+            >
+              O que vem no Trilha do Lucro
+            </h3>
+            {/* TODO Vitor: confirmar deliverables reais */}
+            <ul className="space-y-2.5">
+              {[
+                'Diagnóstico completo do seu número-chave (ponto de equilíbrio real)',
+                'Playbook passo a passo pra identificar onde o lucro está escapando',
+                'Planilha de precificação e margem pronta pra usar',
+                'Checklist de auditoria financeira da loja',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <CheckCircle2
+                    className="w-4 h-4 flex-shrink-0 mt-0.5"
+                    style={{ color: '#2E7D32' }}
+                  />
+                  <span className="text-sm text-gray-700 leading-snug">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* CheckoutButton — ponto de conversão primário */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="px-4 mt-4"
+          >
+            <a
+              href={checkoutUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={trackBeginCheckout}
+              className="flex items-center justify-center w-full h-16 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] transition-transform gap-2"
+              style={{
+                background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)',
+                color: '#1B5E20',
+                fontFamily: 'var(--font-montserrat), sans-serif',
+              }}
+            >
+              Garantir minha vaga por R$27
+              <ArrowRight className="w-5 h-5 flex-shrink-0" />
+            </a>
+          </motion.div>
+
+          {/* Mini-FAQ colapsável — <details> nativo, sem estado React */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 overflow-hidden"
+          >
+            {[
+              {
+                q: 'Pra quem é o Trilha do Lucro?',
+                a: 'Para lojistas e empreendedores que faturam mas não veem dinheiro sobrar. Se você sente que trabalha muito e no fim do mês o caixa não fecha, este produto é pra você.',
+              },
+              {
+                q: 'Preciso saber de finanças?',
+                a: 'Não. A linguagem é direta e prática — sem termos técnicos. Se você sabe quanto fatura e quanto gasta, já dá pra começar.',
+              },
+              {
+                q: 'Como eu acesso depois de comprar?',
+                a: 'O acesso é imediato. Você recebe o link no e-mail cadastrado na Hotmart assim que o pagamento é confirmado.',
+              },
+              {
+                q: 'E se eu não gostar?',
+                a: 'Garantia de 7 dias incondicional. Devolução total, sem perguntas.',
+              },
+            ].map(({ q, a }) => (
+              <details key={q} className="group border-b border-gray-100 last:border-b-0">
+                <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none text-sm font-medium text-gray-800">
+                  {q}
+                  <svg
+                    className="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform group-open:rotate-180"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </summary>
+                <p className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </motion.div>
+        </>
+      )}
 
       {/* PAYWALL + conteúdo pago — conteúdo sempre renderizado; borrado quando não pago */}
       <div className="relative mt-4">
