@@ -6,6 +6,7 @@ import { ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Clock } from 'luc
 import type { DiagnosticInput, DiagnosticResult } from '@/types';
 import { trackCtaClick, trackBeginCheckout } from '@/lib/tracking';
 import { appendUtms } from '@/lib/utm';
+import { PRODUCT_DELIVERABLES } from '@/lib/constants';
 
 interface PaywallScreenProps {
   onUnlock: () => void;
@@ -17,15 +18,6 @@ interface PaywallScreenProps {
 const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '27,00';
 const PRICE_ORIGINAL = '37,00';
 
-const DELIVERABLES = [
-  { benefit: 'Planilha completa com 6 abas prontas pra usar — pré-preenchida com seus dados reais', tag: 'Planilha Guiada' },
-  { benefit: 'Saiba exatamente quanto precisa vender por dia, semana e mês pra cobrir todas as contas', tag: 'Meta de Vendas' },
-  { benefit: 'Lista guiada de gastos fixos — identifique onde está sangrando dinheiro todo mês', tag: 'Gastos Fixos' },
-  { benefit: 'Calculadora de preço com margens sugeridas pro seu tipo de loja — nunca mais venda no prejuízo', tag: 'Formação de Preço' },
-  { benefit: 'Controle mensal completo — veja se o problema é na operação, nos investimentos ou nos financiamentos', tag: 'Meu Dinheiro no Mês' },
-  { benefit: 'Plano de ação 30/60/90 dias com checklist passo a passo pra colocar em prática hoje', tag: 'Plano de Ação' },
-  { benefit: 'Relatório PDF Raio-X Financeiro completo para imprimir, guardar e consultar quando precisar', tag: 'Relatório PDF' },
-];
 
 export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps) {
   const [email, setEmail] = useState('');
@@ -137,7 +129,7 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
               O que você vai desbloquear agora
             </p>
             <ul className="space-y-2.5">
-              {DELIVERABLES.map(({ benefit, tag }) => (
+              {PRODUCT_DELIVERABLES.map(({ benefit, tag }) => (
                 <li key={tag} className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
                   <span className="text-sm text-gray-700 leading-snug">{benefit}</span>

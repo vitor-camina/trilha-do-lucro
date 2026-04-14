@@ -11,6 +11,7 @@ import type {
 import { formatBRL, formatPercent } from '@/lib/formatters';
 import { trackBeginCheckout } from '@/lib/tracking';
 import { appendUtms } from '@/lib/utm';
+import { PRODUCT_DELIVERABLES } from '@/lib/constants';
 import { generateStrategy } from '@/lib/strategy-generator';
 import { useProgress } from '@/hooks/useProgress';
 import { BusinessClassBadge } from './BusinessClassBadge';
@@ -261,20 +262,14 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             >
               O que vem no Trilha do Lucro
             </h3>
-            {/* TODO Vitor: confirmar deliverables reais */}
             <ul className="space-y-2.5">
-              {[
-                'Diagnóstico completo do seu número-chave (ponto de equilíbrio real)',
-                'Playbook passo a passo pra identificar onde o lucro está escapando',
-                'Planilha de precificação e margem pronta pra usar',
-                'Checklist de auditoria financeira da loja',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-2.5">
+              {PRODUCT_DELIVERABLES.map(({ benefit, tag }) => (
+                <li key={tag} className="flex items-start gap-2.5">
                   <CheckCircle2
                     className="w-4 h-4 flex-shrink-0 mt-0.5"
                     style={{ color: '#2E7D32' }}
                   />
-                  <span className="text-sm text-gray-700 leading-snug">{item}</span>
+                  <span className="text-sm text-gray-700 leading-snug">{benefit}</span>
                 </li>
               ))}
             </ul>
