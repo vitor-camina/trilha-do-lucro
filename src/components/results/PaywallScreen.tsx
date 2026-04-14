@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import type { DiagnosticInput, DiagnosticResult } from '@/types';
+import { trackBeginCheckout, buildHotmartUrl } from '@/lib/analytics';
 
 interface PaywallScreenProps {
   onUnlock: () => void;
@@ -12,8 +13,8 @@ interface PaywallScreenProps {
   result?: DiagnosticResult;
 }
 
-const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '37,00';
-const PRICE_ORIGINAL = '197,00';
+const PRICE_SALE = process.env.NEXT_PUBLIC_PRICE || '27,00';
+const PRICE_ORIGINAL = '37,00';
 
 const DELIVERABLES = [
   { benefit: 'Planilha completa com 6 abas prontas pra usar — pré-preenchida com seus dados reais', tag: 'Planilha Guiada' },
@@ -50,7 +51,8 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
         // silently fail
       }
     }
-    window.open(hotmartUrl, '_blank');
+    trackBeginCheckout();
+    window.open(buildHotmartUrl(hotmartUrl), '_blank', 'noopener,noreferrer');
   }
 
   return (
