@@ -42,7 +42,12 @@ export interface Insight {
 }
 
 // Configuração de cada pergunta do quiz
-export type QuestionType = 'currency' | 'percent';
+export type QuestionType = 'currency' | 'percent' | 'range_select';
+
+export interface RangeOption {
+  label: string;
+  value: number; // ponto médio da faixa, usado nos cálculos
+}
 
 export interface QuizQuestion {
   id: keyof DiagnosticInput;
@@ -56,6 +61,7 @@ export interface QuizQuestion {
   defaultValue?: number;
   placeholder?: string;
   optional?: boolean; // se true, valor 0 é permitido
+  options?: RangeOption[]; // para type === 'range_select'
 }
 
 // Checklist de ações 30/60/90 dias

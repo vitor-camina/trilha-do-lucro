@@ -1,5 +1,6 @@
 import type { DiagnosticInput, DiagnosticResult, BusinessClassification } from '@/types';
-import { downloadBlob } from '@/lib/download';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ExcelJS = require('exceljs');
 
 // ─── Paleta de cores (ARGB) ──────────────────────────────────────────────────
 const C = {
@@ -103,11 +104,6 @@ export async function generateSpreadsheet(
   classification: BusinessClassification,
   businessName:   string,
 ) {
-  const ExcelJSModule = await import('exceljs');
-  // Dynamic import of a CJS module wraps it as { default: module.exports }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ExcelJS = (ExcelJSModule as any).default ?? ExcelJSModule;
-  console.log('ExcelJS loaded:', !!ExcelJS, 'Workbook:', typeof ExcelJS?.Workbook);
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Trilha do Lucro';
   workbook.created = new Date();
@@ -1169,15 +1165,12 @@ export async function generateSpreadsheet(
   pm.alignment = { wrapText: true, vertical: 'middle', indent: 1 };
   plano.getRow(pr).height = 36;
 
-  // ─── Gera e baixa o arquivo ───────────────────────────────────────────────
+  // ─── Retorna buffer + nome do arquivo para o chamador ────────────────────
   const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
   const filename = `trilha-lucro-${(businessName || 'meu-negocio')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-')}.xlsx`;
-  downloadBlob(blob, filename);
+  return { buffer, filename };
 }

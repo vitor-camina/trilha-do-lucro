@@ -6,15 +6,17 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { QuizQuestion, DiagnosticInput } from '@/types';
 import { CurrencyInput } from './CurrencyInput';
 import { PercentSlider } from './PercentSlider';
+import { RangeSelectInput } from './RangeSelectInput';
 
 interface QuestionScreenProps {
   question: QuizQuestion;
   value: number;
   onChange: (field: keyof DiagnosticInput, value: number) => void;
+  onAutoAdvance: () => void;
   direction: number; // 1 para frente, -1 para trás
 }
 
-export function QuestionScreen({ question, value, onChange, direction }: QuestionScreenProps) {
+export function QuestionScreen({ question, value, onChange, onAutoAdvance, direction }: QuestionScreenProps) {
   const [showHint, setShowHint] = useState(false);
 
   return (
@@ -47,6 +49,13 @@ export function QuestionScreen({ question, value, onChange, direction }: Questio
           value={value}
           onChange={(v) => onChange(question.id, v)}
           placeholder={question.placeholder}
+        />
+      ) : question.type === 'range_select' ? (
+        <RangeSelectInput
+          options={question.options!}
+          value={value}
+          onChange={(v) => onChange(question.id, v)}
+          onAutoAdvance={onAutoAdvance}
         />
       ) : (
         <PercentSlider

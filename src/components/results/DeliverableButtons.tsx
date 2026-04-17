@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Table2, ListChecks, Download, Loader2 } from 'lucide-react';
 import type { DiagnosticInput, DiagnosticResult, BusinessClassification, Insight } from '@/types';
+import { downloadBlob } from '@/lib/download';
 
 interface DeliverableButtonsProps {
   input: DiagnosticInput;
@@ -42,8 +43,16 @@ export function DeliverableButtons({
   async function handleDownloadXlsx() {
     setLoadingXlsx(true);
     try {
-      const { generateSpreadsheet } = await import('@/lib/spreadsheet/generate-spreadsheet');
-      await generateSpreadsheet(input, result, classification, businessName);
+      const res = await fetch('/api/spreadsheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input, result, classification, businessName }),
+      });
+      if (!res.ok) throw new Error('Erro do servidor');
+      const blob = await res.blob();
+      const disposition = res.headers.get('Content-Disposition') ?? '';
+      const filename = disposition.match(/filename="([^"]+)"/)?.[1] ?? 'planilha.xlsx';
+      downloadBlob(blob, filename);
     } catch (err) {
       console.error('Erro ao gerar planilha:', err);
       alert('Não foi possível gerar a planilha. Tente novamente ou use um computador.');

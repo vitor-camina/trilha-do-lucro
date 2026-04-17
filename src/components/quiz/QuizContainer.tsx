@@ -37,6 +37,16 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
     }
   }
 
+  // Chamado pelo RangeSelectInput após seleção — avança sem checar estado (seleção já é válida)
+  function handleAutoAdvance() {
+    if (isLastStep) {
+      onSubmit();
+    } else {
+      setDirection(1);
+      setCurrentStep(currentStep + 1);
+    }
+  }
+
   function handleBack() {
     if (isFirstStep) return;
     setDirection(-1);
@@ -55,6 +65,7 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
           question={currentQuestion}
           value={currentValue}
           onChange={onUpdateField}
+          onAutoAdvance={handleAutoAdvance}
           direction={direction}
         />
       </AnimatePresence>
