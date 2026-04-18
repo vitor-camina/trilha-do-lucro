@@ -195,7 +195,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       {/* ─── RESULTADO BÁSICO (grátis) ─────────────────────────────────── */}
 
       {/* Classificação */}
-      <div className="bg-white pt-6 pb-6 px-6">
+      <div className="bg-white pt-3 pb-3 px-6">
         <BusinessClassBadge classification={classification} />
       </div>
 
@@ -204,9 +204,9 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="bg-white border-t border-gray-100 px-6 py-4"
+        className="bg-white border-t border-gray-100 px-6 py-2"
       >
-        <p className="text-center text-gray-700 text-base leading-relaxed">
+        <p className="text-center text-gray-700 text-sm leading-snug">
           {result.lucroReal >= 0 ? (
             <>Sua loja gera <span className="font-bold text-green-600">{formatBRL(result.lucroReal)}</span> de lucro real por mês</>
           ) : (
@@ -220,12 +220,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
-        className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5"
+        className="mx-4 mt-2 bg-white rounded-2xl border border-gray-100 p-3"
       >
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Dados informados
         </h3>
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
             <p className="text-gray-400">Faturamento</p>
             <p className="font-semibold text-gray-900">{formatBRL(input.faturamento)}</p>
@@ -248,7 +248,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
           </div>
           <div>
             <p className="text-gray-400">Frete</p>
-            <p className="font-semibold text-gray-900">{input.fretePercentual ?? 0}% do faturamento</p>
+            <p className="font-semibold text-gray-900">{input.fretePercentual ?? 0}% fat.</p>
           </div>
         </div>
       </motion.div>
@@ -256,9 +256,24 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       {/* ═══ BLOCOS DE CONVERSÃO — apenas para não-pagantes ═══════════════ */}
       {!isPaid && (
         <>
+          {/* Indicador de scroll */}
+          <div className="flex flex-col items-center gap-1 mt-3 mb-1">
+            <p className="text-xs font-semibold" style={{ color: '#1B5E20' }}>Veja sua oferta especial</p>
+            <svg
+              className="animate-bounce w-5 h-5"
+              style={{ color: '#1B5E20' }}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+
           {/* Separador visual */}
           <div
-            className="mx-4 mt-6 h-px"
+            className="mx-4 mt-2 h-px"
             style={{ background: 'linear-gradient(to right, transparent, #1B5E20 40%, #1B5E20 60%, transparent)' }}
           />
 
@@ -294,7 +309,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                   fontFamily: 'var(--font-montserrat), sans-serif',
                 }}
               >
-                Desbloquear minha análise completa — R$27
+                Desbloquear análise completa — R$27
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
 
@@ -401,7 +416,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 fontFamily: 'var(--font-montserrat), sans-serif',
               }}
             >
-              Desbloquear minha análise completa — R$27
+              Desbloquear análise completa — R$27
               <ArrowRight className="w-5 h-5 flex-shrink-0" />
             </a>
           </motion.div>
@@ -494,7 +509,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                   fontFamily: 'var(--font-montserrat), sans-serif',
                 }}
               >
-                Desbloquear minha análise completa — R$27
+                Desbloquear análise completa — R$27
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
               <button
