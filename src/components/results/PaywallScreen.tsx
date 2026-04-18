@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import type { DiagnosticInput, DiagnosticResult } from '@/types';
@@ -20,8 +19,6 @@ const PRICE_ORIGINAL = '37,00';
 
 
 export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps) {
-  const [email, setEmail] = useState('');
-
   const margem = result?.margemLiquida ?? 0;
   const faturamento = input?.faturamento ?? 0;
 
@@ -35,15 +32,6 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
   const hasRealData = faturamento > 0 && result != null;
 
   function handleCTA() {
-    if (email) {
-      try {
-        const leads = JSON.parse(localStorage.getItem('raiox_leads') || '[]');
-        leads.push({ email, date: new Date().toISOString() });
-        localStorage.setItem('raiox_leads', JSON.stringify(leads));
-      } catch {
-        // silently fail
-      }
-    }
     trackCtaClick('DESBLOQUEAR MINHA ANÁLISE COMPLETA', 'paywall');
     trackBeginCheckout();
     window.open(appendUtms(hotmartUrl), '_blank', 'noopener,noreferrer');
@@ -164,16 +152,6 @@ export function PaywallScreen({ hotmartUrl, input, result }: PaywallScreenProps)
             </div>
             <p className="text-xs text-gray-400 mt-1">Pagamento único · Acesso imediato · Sem mensalidade</p>
           </div>
-
-          {/* Email */}
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Seu melhor e-mail (para receber o acesso)"
-            className="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2"
-            style={{ focusRingColor: '#1B5E20' } as React.CSSProperties}
-          />
 
           {/* CTA dourado */}
           <button

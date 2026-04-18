@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCcw, CheckCircle2, ArrowRight } from 'lucide-react';
+import { RotateCcw, CheckCircle2, ArrowRight, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type {
   DiagnosticInput, DiagnosticResult, BusinessClassification, Insight,
@@ -17,7 +17,6 @@ import { useProgress } from '@/hooks/useProgress';
 import { BusinessClassBadge } from './BusinessClassBadge';
 import { MetricCard } from './MetricCard';
 import { InsightsPanel } from './InsightsPanel';
-import { PaywallScreen } from './PaywallScreen';
 import { DeliverableButtons } from './DeliverableButtons';
 import { ActionChecklist } from './ActionChecklist';
 import PurposeQuiz from '@/components/paid/PurposeQuiz';
@@ -47,6 +46,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   const [showChecklist, setShowChecklist] = useState(false);
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState(HOTMART_CHECKOUT_URL);
+
+  // Personalização do bloco de urgência
+  const margem = result.margemLiquida;
+  const porMil = Math.round(margem * 10);
+  const gapMensal = input.faturamento > 0 ? Math.max(0, (0.20 - margem / 100) * input.faturamento) : 0;
+  const gapAnual = gapMensal * 12;
 
   const {
     paidStep,
@@ -128,7 +133,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     );
   }
 
-  // ─── Tela principal (financial + strategy resultado) ────────────────────
+  // ─── Tela principal ────────────────────────────────────────────────────
 
   return (
     <div className="min-h-[100dvh] pb-8" style={{ backgroundColor: '#F5F5F5' }}>
@@ -187,12 +192,14 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </motion.div>
       )}
 
-      {/* Header com classificação — GRÁTIS */}
+      {/* ─── RESULTADO BÁSICO (grátis) ─────────────────────────────────── */}
+
+      {/* Classificação */}
       <div className="bg-white pt-6 pb-6 px-6">
         <BusinessClassBadge classification={classification} />
       </div>
 
-      {/* Frase de impacto — GRÁTIS */}
+      {/* Frase de impacto */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -208,7 +215,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </p>
       </motion.div>
 
-      {/* Resumo dos dados informados — GRÁTIS */}
+      {/* Dados informados */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -246,14 +253,114 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </div>
       </motion.div>
 
-      {/* ═══ Blocos de clareza + conversão — visíveis SEM scroll, só quando !isPaid ═══ */}
+      {/* ═══ BLOCOS DE CONVERSÃO — apenas para não-pagantes ═══════════════ */}
       {!isPaid && (
         <>
-          {/* O que vem no Trilha do Lucro */}
+          {/* Separador visual */}
+          <div
+            className="mx-4 mt-6 h-px"
+            style={{ background: 'linear-gradient(to right, transparent, #1B5E20 40%, #1B5E20 60%, transparent)' }}
+          />
+
+          {/* 1. Bloco de transição + CTA primário */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="mx-4 mt-4 rounded-2xl overflow-hidden"
+            style={{ border: '2px solid #1B5E20' }}
+          >
+            {/* Cabeçalho verde */}
+            <div className="px-5 py-4" style={{ backgroundColor: '#1B5E20' }}>
+              <p className="text-white font-bold text-base leading-snug">
+                👆 Este é apenas o resumo. Sua análise completa com plano de ação personalizado está pronta.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                Descubra exatamente onde cortar gastos, quanto precisa vender por dia, e receba sua planilha pré-preenchida com seus dados.
+              </p>
+            </div>
+
+            {/* Botão + trust signals + badge de urgência */}
+            <div className="bg-white px-5 py-4">
+              <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackBeginCheckout}
+                className="flex items-center justify-center w-full h-16 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] transition-transform gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)',
+                  color: '#FFFFFF',
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                }}
+              >
+                Desbloquear minha análise completa — R$27
+                <ArrowRight className="w-5 h-5 flex-shrink-0" />
+              </a>
+
+              {/* Trust signals */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+                  <p className="text-xs text-gray-600 leading-snug">
+                    <span className="font-semibold">Garantia de 7 dias</span> — devolvemos cada centavo, sem perguntas.
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+                  <p className="text-xs text-gray-600 leading-snug">
+                    Lojistas que ajustam a precificação com dados reais aumentam a margem em média{' '}
+                    <span className="font-semibold" style={{ color: '#2E7D32' }}>8 a 15%</span>.
+                  </p>
+                </div>
+              </div>
+
+              {/* Badge de urgência */}
+              <div
+                className="mt-3 flex items-center justify-center rounded-xl py-2 px-4"
+                style={{ backgroundColor: '#FFFDE7', border: '1px solid #F9A825' }}
+              >
+                <span className="text-sm font-semibold text-center" style={{ color: '#E65100' }}>
+                  ⏰ Oferta de lançamento — preço sobe pra R$37 após domingo
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 2. Seção "Análise completa bloqueada" */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.0 }}
+            transition={{ delay: 1.1 }}
+            className="mx-4 mt-4 relative overflow-hidden rounded-2xl"
+          >
+            <div className="blur-sm opacity-30 pointer-events-none select-none p-4 space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 p-4">
+                  <div className="h-3 bg-gray-200 rounded w-32 mb-2" />
+                  <div className="h-6 bg-gray-300 rounded w-24 mb-1" />
+                  <div className="h-2 bg-gray-100 rounded w-48" />
+                </div>
+              ))}
+            </div>
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ background: 'linear-gradient(to bottom, transparent, rgba(245,245,245,0.8))' }}
+            >
+              <span
+                className="text-sm font-semibold bg-white/90 px-4 py-2 rounded-full shadow"
+                style={{ color: '#1B5E20' }}
+              >
+                Análise completa bloqueada
+              </span>
+            </div>
+          </motion.div>
+
+          {/* 3. O que vem no Trilha do Lucro */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
             className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5"
           >
             <h3
@@ -275,11 +382,11 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             </ul>
           </motion.div>
 
-          {/* CheckoutButton — ponto de conversão primário */}
+          {/* 4. Segundo CTA */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 }}
+            transition={{ delay: 1.3 }}
             className="px-4 mt-4"
           >
             <a
@@ -294,16 +401,16 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 fontFamily: 'var(--font-montserrat), sans-serif',
               }}
             >
-              Garantir minha vaga por R$27
+              Desbloquear minha análise completa — R$27
               <ArrowRight className="w-5 h-5 flex-shrink-0" />
             </a>
           </motion.div>
 
-          {/* Mini-FAQ colapsável — <details> nativo, sem estado React */}
+          {/* 5. FAQ */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 1.4 }}
             className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 overflow-hidden"
           >
             {[
@@ -341,17 +448,72 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
               </details>
             ))}
           </motion.div>
+
+          {/* 6. Bloco de urgência "DIAGNÓSTICO PERSONALIZADO" */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="mx-4 mt-4 rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
+          >
+            <div className="px-6 pt-6 pb-5" style={{ backgroundColor: '#1B5E20' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0" style={{ color: '#F9A825' }} />
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#F9A825' }}>
+                  Diagnóstico Personalizado
+                </span>
+              </div>
+              <h2
+                className="text-xl font-bold text-white leading-tight mb-2"
+                style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
+              >
+                {margem <= 0
+                  ? 'Sua loja está operando no vermelho — cada dia assim aprofunda o buraco.'
+                  : `Sua margem é de ${margem.toFixed(1)}% — de cada R$\u00A01.000 que entra, só R$\u00A0${porMil} fica com você.`}
+              </h2>
+              {gapAnual > 1000 && (
+                <p className="text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                  Se nada mudar nos próximos 12 meses, você vai deixar aproximadamente{' '}
+                  <span className="font-bold" style={{ color: '#F9A825' }}>
+                    R$&nbsp;{gapAnual.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>{' '}
+                  na mesa — dinheiro que poderia estar no seu bolso.
+                </p>
+              )}
+            </div>
+            <div className="bg-white px-6 py-5 space-y-3">
+              <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackBeginCheckout}
+                className="w-full py-4 rounded-2xl font-bold text-base shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)',
+                  color: '#1B5E20',
+                  fontFamily: 'var(--font-montserrat), sans-serif',
+                }}
+              >
+                Desbloquear minha análise completa — R$27
+                <ArrowRight className="w-5 h-5 flex-shrink-0" />
+              </a>
+              <button
+                type="button"
+                onClick={() => window.open('https://app.hotmart.com/products/purchased', '_blank')}
+                className="w-full text-sm text-center py-1 underline underline-offset-2"
+                style={{ color: '#1B5E20' }}
+              >
+                Já paguei — acessar minha compra
+              </button>
+            </div>
+          </motion.div>
         </>
       )}
 
-      {/* PAYWALL + conteúdo pago — conteúdo sempre renderizado; borrado quando não pago */}
-      <div className="relative mt-4">
-        {/* Paid content — blurred and non-interactive for non-paid users */}
-        <div
-          style={!isPaid ? { filter: 'blur(8px)', pointerEvents: 'none', userSelect: 'none' } : undefined}
-          aria-hidden={!isPaid || undefined}
-        >
-          {/* Métricas detalhadas — PAGO */}
+      {/* ═══ CONTEÚDO PAGO ═══════════════════════════════════════════════ */}
+      {isPaid && (
+        <div className="mt-4">
+          {/* Métricas detalhadas */}
           <div className="px-4 space-y-3">
             <MetricCard
               label="Quanto sobra de verdade"
@@ -387,12 +549,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             />
           </div>
 
-          {/* Insights / Recomendações — PAGO */}
+          {/* Insights / Recomendações */}
           <div className="px-4 mt-6">
             <InsightsPanel insights={insights} />
           </div>
 
-          {/* Materiais para download — PAGO */}
+          {/* Materiais para download */}
           <div className="px-4 mt-6">
             <DeliverableButtons
               input={input}
@@ -404,15 +566,15 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             />
           </div>
 
-          {/* Checklist 30/60/90 — PAGO */}
-          {showChecklist && isPaid && (
+          {/* Checklist 30/60/90 */}
+          {showChecklist && (
             <div className="px-4 mt-4">
               <ActionChecklist level={classification.level} />
             </div>
           )}
 
           {/* Resultado da estratégia gerada */}
-          {isPaid && paidStep === 'strategy' && (strategy || purposeAnswers.q1) && (
+          {paidStep === 'strategy' && (strategy || purposeAnswers.q1) && (
             <StrategyResult
               strategy={strategy ?? generateStrategy(purposeAnswers)}
               swotAnswers={swotAnswers}
@@ -421,19 +583,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             />
           )}
         </div>
-
-        {/* PaywallScreen overlay — absolutely positioned on top of blurred content */}
-        {!isPaid && (
-          <div className="absolute inset-x-0 top-0 z-10">
-            <PaywallScreen
-              onUnlock={handleUnlock}
-              hotmartUrl={HOTMART_CHECKOUT_URL}
-              input={input}
-              result={result}
-            />
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Botão refazer — sempre visível */}
       <div className="px-4 mt-8">
