@@ -25,6 +25,12 @@ import SwotCrossingComponent from '@/components/paid/SwotCrossing';
 
 const HOTMART_CHECKOUT_URL = process.env.NEXT_PUBLIC_HOTMART_URL || 'https://pay.hotmart.com/W105207264J';
 
+function getLossRange(absLoss: number): string {
+  if (absLoss < 2000) return 'entre R$500 e R$3.000';
+  if (absLoss <= 5000) return 'entre R$1.000 e R$5.000';
+  return 'entre R$3.000 e R$10.000';
+}
+
 interface ResultsDashboardProps {
   input: DiagnosticInput;
   result: DiagnosticResult;
@@ -208,49 +214,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       >
         <p className="text-center text-gray-700 text-base leading-relaxed">
           {result.lucroReal >= 0 ? (
-            <>Sua loja gera <span className="font-bold text-green-600">{formatBRL(result.lucroReal)}</span> de lucro real por mês</>
+            <>Seu negócio está <span className="font-bold text-green-600">no positivo</span> — veja como proteger e ampliar esse resultado</>
           ) : (
-            <>Sua loja está perdendo <span className="font-bold text-red-600">{formatBRL(Math.abs(result.lucroReal))}</span> por mês</>
+            <>Seu negócio está com <span className="font-bold text-red-600">Prejuízo</span> — estimamos{' '}
+              <span className="font-bold text-red-600">{getLossRange(Math.abs(result.lucroReal))}/mês</span>
+            </>
           )}
         </p>
-      </motion.div>
-
-      {/* Dados informados */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.9 }}
-        className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5"
-      >
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
-          Dados informados
-        </h3>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p className="text-gray-400">Faturamento</p>
-            <p className="font-semibold text-gray-900">{formatBRL(input.faturamento)}</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Custos fixos</p>
-            <p className="font-semibold text-gray-900">{formatBRL(input.custosFixos)}</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Custo do produto</p>
-            <p className="font-semibold text-gray-900">{input.custoProductPercent}%</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Taxas</p>
-            <p className="font-semibold text-gray-900">{input.taxaPercent}%</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Pró-labore desejado</p>
-            <p className="font-semibold text-gray-900">{formatBRL(input.proLabore)}</p>
-          </div>
-          <div>
-            <p className="text-gray-400">Frete</p>
-            <p className="font-semibold text-gray-900">{input.fretePercentual ?? 0}% do faturamento</p>
-          </div>
-        </div>
       </motion.div>
 
       {/* ═══ BLOCOS DE CONVERSÃO — apenas para não-pagantes ═══════════════ */}
@@ -272,15 +242,15 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
           >
             {/* Cabeçalho verde */}
             <div className="px-5 py-4" style={{ backgroundColor: '#1B5E20' }}>
-              <p className="text-white font-bold text-base leading-snug">
-                👆 Este é apenas o resumo. Sua análise completa com plano de ação personalizado está pronta.
+              <p className="text-white font-bold text-lg leading-snug mb-1">
+                O que está causando isso?
               </p>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+              <p className="mt-1 text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
                 Descubra exatamente onde cortar gastos, quanto precisa vender por dia, e receba sua planilha pré-preenchida com seus dados.
               </p>
             </div>
 
-            {/* Botão + trust signals + badge de urgência */}
+            {/* Botão + ancoragem + trust signals + badge de urgência */}
             <div className="bg-white px-5 py-4">
               <a
                 href={checkoutUrl}
@@ -294,9 +264,16 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                   fontFamily: 'var(--font-montserrat), sans-serif',
                 }}
               >
-                Desbloquear minha análise completa — R$27
+                {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
+
+              {/* Ancoragem de preço */}
+              <p className="mt-2 text-xs text-center text-gray-500">
+                {isPositive
+                  ? 'Menos que o custo de uma pizza pra proteger seu negócio.'
+                  : 'Menos do que 1 dia do prejuízo que você está tendo.'}
+              </p>
 
               {/* Trust signals */}
               <div className="mt-3 space-y-2">
@@ -321,42 +298,74 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 style={{ backgroundColor: '#FFFDE7', border: '1px solid #F9A825' }}
               >
                 <span className="text-sm font-semibold text-center" style={{ color: '#E65100' }}>
-                  ⏰ Oferta de lançamento — preço sobe pra R$37 após domingo
+                  ⏰ Oferta de lançamento — preço sobe pra R$37 em breve
                 </span>
               </div>
             </div>
           </motion.div>
 
-          {/* 2. Seção "Análise completa bloqueada" */}
+          {/* 2. Prévia borrada — cria curiosidade */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.1 }}
             className="mx-4 mt-4 relative overflow-hidden rounded-2xl"
           >
-            <div className="blur-sm opacity-30 pointer-events-none select-none p-4 space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-100 p-4">
-                  <div className="h-3 bg-gray-200 rounded w-32 mb-2" />
-                  <div className="h-6 bg-gray-300 rounded w-24 mb-1" />
-                  <div className="h-2 bg-gray-100 rounded w-48" />
+            <div className="blur-md opacity-60 pointer-events-none select-none p-4 space-y-2">
+              {[
+                { label: 'Seu faturamento ideal', value: 'R$ 18.750' },
+                { label: 'Break-even diário', value: 'R$ 412' },
+                { label: 'Margem que você deveria ter', value: '22,4%' },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-white rounded-xl border border-gray-100 p-4">
+                  <p className="text-xs text-gray-400 mb-1">{label}</p>
+                  <p className="text-xl font-bold text-gray-800">{value}</p>
                 </div>
               ))}
             </div>
             <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ background: 'linear-gradient(to bottom, transparent, rgba(245,245,245,0.8))' }}
+              className="absolute inset-0 flex flex-col items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(245,245,245,0.85) 40%)' }}
             >
+              <span className="text-lg">🔒</span>
               <span
-                className="text-sm font-semibold bg-white/90 px-4 py-2 rounded-full shadow"
+                className="text-sm font-semibold bg-white/95 px-4 py-2 rounded-full shadow"
                 style={{ color: '#1B5E20' }}
               >
-                Análise completa bloqueada
+                Desbloqueie para ver seus números reais
               </span>
             </div>
           </motion.div>
 
-          {/* 3. O que vem no Trilha do Lucro */}
+          {/* 3. Prova social */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.15 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5 space-y-3"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">👥</span>
+              <p className="text-sm font-semibold text-gray-800">
+                +300 lojistas já fizeram o diagnóstico
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">📊</span>
+              <p className="text-sm text-gray-600 leading-snug">
+                <span className="font-semibold text-gray-800">Dados do SEBRAE:</span> lojistas que conhecem suas margens reais têm{' '}
+                <span className="font-semibold" style={{ color: '#2E7D32' }}>3x mais chance</span> de sobreviver os primeiros 5 anos.
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+              <p className="text-sm text-gray-600 leading-snug">
+                <span className="font-semibold text-gray-800">Garantia total de 7 dias</span> — se não gostar, devolvemos cada centavo sem perguntas.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* 5. O que vem no Trilha do Lucro */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -382,7 +391,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             </ul>
           </motion.div>
 
-          {/* 4. Segundo CTA */}
+          {/* 6. Segundo CTA */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -401,12 +410,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 fontFamily: 'var(--font-montserrat), sans-serif',
               }}
             >
-              Desbloquear minha análise completa — R$27
+              {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
               <ArrowRight className="w-5 h-5 flex-shrink-0" />
             </a>
           </motion.div>
 
-          {/* 5. FAQ */}
+          {/* 7. FAQ */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -449,7 +458,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             ))}
           </motion.div>
 
-          {/* 6. Bloco de urgência "DIAGNÓSTICO PERSONALIZADO" */}
+          {/* 8. Bloco de urgência "DIAGNÓSTICO PERSONALIZADO" */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -494,7 +503,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                   fontFamily: 'var(--font-montserrat), sans-serif',
                 }}
               >
-                Desbloquear minha análise completa — R$27
+                {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
               <button
