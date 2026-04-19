@@ -55,13 +55,13 @@ export const CLASSIFICATIONS: Record<BusinessLevel, BusinessClassification> = {
 
 // Deliverables do produto pago (fonte canônica — usada em PaywallScreen e ResultsDashboard)
 export const PRODUCT_DELIVERABLES: Array<{ benefit: string; tag: string }> = [
-  { benefit: 'Planilha completa com 6 abas prontas pra usar — pré-preenchida com seus dados reais', tag: 'Planilha Guiada' },
-  { benefit: 'Saiba exatamente quanto precisa vender por dia, semana e mês pra cobrir todas as contas', tag: 'Meta de Vendas' },
-  { benefit: 'Lista guiada de gastos fixos — identifique onde está sangrando dinheiro todo mês', tag: 'Gastos Fixos' },
-  { benefit: 'Calculadora de preço com margens sugeridas pro seu tipo de loja — nunca mais venda no prejuízo', tag: 'Formação de Preço' },
-  { benefit: 'Controle mensal completo — veja se o problema é na operação, nos investimentos ou nos financiamentos', tag: 'Meu Dinheiro no Mês' },
-  { benefit: 'Plano de ação 30/60/90 dias com checklist passo a passo pra colocar em prática hoje', tag: 'Plano de Ação' },
-  { benefit: 'Relatório PDF Raio-X Financeiro completo para imprimir, guardar e consultar quando precisar', tag: 'Relatório PDF' },
+  { benefit: 'Descubra o preço exato que zera seu prejuízo', tag: 'Planilha Guiada' },
+  { benefit: 'Saiba quanto precisa vender POR DIA pra pagar todas as contas', tag: 'Meta de Vendas' },
+  { benefit: 'Identifique os 3 maiores ralos de dinheiro do seu negócio', tag: 'Gastos Fixos' },
+  { benefit: 'Nunca mais venda no prejuízo sem saber', tag: 'Formação de Preço' },
+  { benefit: 'Veja mês a mês se está melhorando ou piorando', tag: 'Meu Dinheiro no Mês' },
+  { benefit: 'Plano de ação passo a passo pra colocar em prática hoje', tag: 'Plano de Ação' },
+  { benefit: 'Relatório completo pra imprimir e consultar quando precisar', tag: 'Relatório PDF' },
 ];
 
 // Perguntas do quiz
