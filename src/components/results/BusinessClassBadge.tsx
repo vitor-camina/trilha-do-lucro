@@ -24,10 +24,10 @@ export function BusinessClassBadge({ classification }: BusinessClassBadgeProps) 
           ],
         }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="w-28 h-28 rounded-full flex items-center justify-center mb-4"
+        className="w-14 h-14 rounded-full flex items-center justify-center mb-2"
         style={{ backgroundColor: classification.bgColor }}
       >
-        <span className="text-5xl">{classification.emoji}</span>
+        <span className="text-2xl">{classification.emoji}</span>
       </motion.div>
 
       {/* Label */}
@@ -35,7 +35,7 @@ export function BusinessClassBadge({ classification }: BusinessClassBadgeProps) 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="text-3xl font-bold mb-2"
+        className="text-2xl font-bold mb-1"
         style={{ color: classification.color }}
       >
         {classification.label}
@@ -46,7 +46,7 @@ export function BusinessClassBadge({ classification }: BusinessClassBadgeProps) 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="text-gray-500 text-base max-w-sm leading-relaxed"
+        className="text-gray-500 text-sm max-w-sm leading-snug"
       >
         {classification.description}
       </motion.p>

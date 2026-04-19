@@ -201,7 +201,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
       {/* ─── RESULTADO BÁSICO (grátis) ─────────────────────────────────── */}
 
       {/* Classificação */}
-      <div className="bg-white pt-6 pb-6 px-6">
+      <div className="bg-white pt-3 pb-3 px-6">
         <BusinessClassBadge classification={classification} />
       </div>
 
@@ -210,9 +210,9 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="bg-white border-t border-gray-100 px-6 py-4"
+        className="bg-white border-t border-gray-100 px-6 py-2"
       >
-        <p className="text-center text-gray-700 text-base leading-relaxed">
+        <p className="text-center text-gray-700 text-sm leading-snug">
           {result.lucroReal >= 0 ? (
             <>Seu negócio está <span className="font-bold text-green-600">no positivo</span> — veja como proteger e ampliar esse resultado</>
           ) : (
@@ -228,7 +228,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         <>
           {/* Separador visual */}
           <div
-            className="mx-4 mt-6 h-px"
+            className="mx-4 mt-2 h-px"
             style={{ background: 'linear-gradient(to right, transparent, #1B5E20 40%, #1B5E20 60%, transparent)' }}
           />
 
