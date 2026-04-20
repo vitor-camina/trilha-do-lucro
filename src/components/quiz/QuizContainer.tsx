@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QUIZ_QUESTIONS } from '@/lib/constants';
 import type { DiagnosticInput } from '@/types';
+import { trackQuizStarted, trackQuizCompleted } from '@/lib/tracking';
 import { QuizProgress } from './QuizProgress';
 import { QuestionScreen } from './QuestionScreen';
 
@@ -27,9 +28,14 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
   const currentValue = input[currentQuestion.id];
   const isValid = currentQuestion.type === 'percent' || currentQuestion.optional || currentValue > 0;
 
+  useEffect(() => {
+    trackQuizStarted();
+  }, []);
+
   function handleNext() {
     if (!isValid) return;
     if (isLastStep) {
+      trackQuizCompleted();
       onSubmit();
     } else {
       setDirection(1);
@@ -40,6 +46,7 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
   // Chamado pelo RangeSelectInput após seleção — avança sem checar estado (seleção já é válida)
   function handleAutoAdvance() {
     if (isLastStep) {
+      trackQuizCompleted();
       onSubmit();
     } else {
       setDirection(1);
