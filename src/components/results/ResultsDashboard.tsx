@@ -257,11 +257,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={trackBeginCheckout}
-                className="flex items-center justify-center w-full h-16 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] transition-transform gap-2"
+                className="flex items-center justify-center text-center w-full h-16 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform gap-2"
                 style={{
-                  background: 'linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                   color: '#FFFFFF',
                   fontFamily: 'var(--font-montserrat), sans-serif',
+                  boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
+                  borderRadius: '16px',
                 }}
               >
                 {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
@@ -403,11 +405,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackBeginCheckout}
-              className="flex items-center justify-center w-full h-16 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] transition-transform gap-2"
+              className="flex items-center justify-center text-center w-full h-16 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform gap-2"
               style={{
-                background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)',
-                color: '#1B5E20',
+                background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                color: '#FFFFFF',
                 fontFamily: 'var(--font-montserrat), sans-serif',
+                boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
+                borderRadius: '16px',
               }}
             >
               {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
@@ -496,11 +500,13 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={trackBeginCheckout}
-                className="w-full py-4 rounded-2xl font-bold text-base shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.98] transition-transform flex items-center justify-center text-center gap-2"
                 style={{
-                  background: 'linear-gradient(135deg, #F9A825 0%, #FF8F00 100%)',
-                  color: '#1B5E20',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  color: '#FFFFFF',
                   fontFamily: 'var(--font-montserrat), sans-serif',
+                  boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
+                  borderRadius: '16px',
                 }}
               >
                 {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
