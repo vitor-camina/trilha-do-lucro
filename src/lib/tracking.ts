@@ -20,6 +20,9 @@ export function trackCtaClick(buttonText: string, buttonLocation: string): void 
 
 export function trackQuizStarted(): void {
   if (typeof window === 'undefined') return;
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'quiz_started');
+  }
   if (typeof window.fbq === 'function') {
     window.fbq('trackCustom', 'QuizStarted');
   }

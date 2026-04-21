@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QUIZ_QUESTIONS } from '@/lib/constants';
-import type { DiagnosticInput } from '@/types';
 import { trackQuizStarted, trackQuizCompleted } from '@/lib/tracking';
+import type { DiagnosticInput } from '@/types';
 import { QuizProgress } from './QuizProgress';
 import { QuestionScreen } from './QuestionScreen';
+import { WelcomeScreen } from './WelcomeScreen';
 
 interface QuizContainerProps {
   input: DiagnosticInput;
@@ -17,8 +18,20 @@ interface QuizContainerProps {
 }
 
 export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerProps) {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(1);
+
+  if (showWelcome) {
+    return (
+      <WelcomeScreen
+        onStart={() => {
+          trackQuizStarted();
+          setShowWelcome(false);
+        }}
+      />
+    );
+  }
   const totalSteps = QUIZ_QUESTIONS.length;
   const currentQuestion = QUIZ_QUESTIONS[currentStep];
   const isLastStep = currentStep === totalSteps - 1;
@@ -27,10 +40,6 @@ export function QuizContainer({ input, onUpdateField, onSubmit }: QuizContainerP
   // Validação: campos de moeda devem ter valor > 0, percentuais e opcionais são sempre válidos
   const currentValue = input[currentQuestion.id];
   const isValid = currentQuestion.type === 'percent' || currentQuestion.optional || currentValue > 0;
-
-  useEffect(() => {
-    trackQuizStarted();
-  }, []);
 
   function handleNext() {
     if (!isValid) return;
