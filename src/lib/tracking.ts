@@ -5,19 +5,6 @@ declare global {
   }
 }
 
-export function trackCtaClick(buttonText: string, buttonLocation: string): void {
-  if (typeof window === 'undefined') return;
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', 'cta_click', {
-      button_text: buttonText,
-      button_location: buttonLocation,
-    });
-  }
-  if (typeof window.fbq === 'function') {
-    window.fbq('track', 'Lead');
-  }
-}
-
 export function trackQuizStarted(): void {
   if (typeof window === 'undefined') return;
   if (typeof window.gtag === 'function') {
@@ -30,8 +17,24 @@ export function trackQuizStarted(): void {
 
 export function trackQuizCompleted(): void {
   if (typeof window === 'undefined') return;
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'quiz_completed');
+  }
   if (typeof window.fbq === 'function') {
     window.fbq('trackCustom', 'QuizCompleted');
+  }
+}
+
+export function trackCtaClick(buttonText: string, buttonLocation: string): void {
+  if (typeof window === 'undefined') return;
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'cta_click', {
+      button_text: buttonText,
+      button_location: buttonLocation,
+    });
+  }
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Lead');
   }
 }
 

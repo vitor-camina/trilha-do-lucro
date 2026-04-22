@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackQuizStarted } from '@/lib/tracking';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -15,6 +16,11 @@ const bullets = [
 ];
 
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
+  function handleStart() {
+    trackQuizStarted();
+    onStart();
+  }
+
   return (
     <div className="flex flex-col min-h-[100dvh] bg-white">
       {/* Top accent bar */}
@@ -97,7 +103,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
             <Button
               size="lg"
-              onClick={onStart}
+              onClick={handleStart}
               className="w-full h-14 rounded-2xl text-lg font-extrabold text-white shadow-lg"
               style={{
                 background: 'linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)',
