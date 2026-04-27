@@ -31,6 +31,12 @@ function getLossRange(absLoss: number): string {
   return 'entre R$3.000 e R$10.000';
 }
 
+function getPasHeadline(level: string): string {
+  if (level === 'prejuizo') return 'Encontramos o motivo do vermelho. Não é azar — são problemas específicos.';
+  if (level === 'sobrevivendo') return 'Sua loja sobrevive, mas está um mês ruim de entrar em crise.';
+  return 'Você está no positivo — mas está deixando dinheiro real escapar todo mês.';
+}
+
 interface ResultsDashboardProps {
   input: DiagnosticInput;
   result: DiagnosticResult;
@@ -53,7 +59,6 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   const [strategy, setStrategy] = useState<GeneratedStrategy | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState(HOTMART_CHECKOUT_URL);
 
-  // Personalização do bloco de urgência
   const margem = result.margemLiquida;
   const porMil = Math.round(margem * 10);
   const gapMensal = input.faturamento > 0 ? Math.max(0, (0.20 - margem / 100) * input.faturamento) : 0;
@@ -91,8 +96,6 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     localStorage.setItem('raiox_paid', 'true');
   }
 
-  // ─── Handlers de transição entre etapas pagas ────────────────────────────
-
   function handlePurposeComplete(answers: PurposeAnswers) {
     goToStep('swot', { purposeAnswers: answers });
   }
@@ -107,7 +110,6 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     goToStep('strategy', { swotCrossing: crossing });
   }
 
-  // Se estamos numa das telas de wizard pago, renderiza só ela (fullscreen)
   if (isPaid && paidStep === 'purpose') {
     return (
       <PurposeQuiz
@@ -139,23 +141,30 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
     );
   }
 
-  // ─── Tela principal ────────────────────────────────────────────────────
+  const ctaLabel = isPositive
+    ? 'Ver meu plano pra aumentar o lucro — R$27'
+    : 'Ver meu plano pra sair do prejuízo — R$27';
+
+  const ctaStyle = {
+    background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+    color: '#FFFFFF',
+    fontFamily: 'var(--font-montserrat), sans-serif',
+    boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
+    borderRadius: '16px',
+  } as const;
 
   return (
     <div className="min-h-[100dvh] pb-8" style={{ backgroundColor: '#F5F5F5' }}>
       {/* Header com logo */}
       <div className="flex items-center justify-center py-4 px-6" style={{ backgroundColor: '#1B5E20' }}>
         <div className="flex items-center gap-3">
-          {/* SVG bússola inline */}
+          {/* SVG bussola inline */}
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="20" cy="20" r="18" stroke="#F9A825" strokeWidth="2.5" fill="none" />
             <circle cx="20" cy="20" r="12" fill="#2E7D32" fillOpacity="0.3" />
-            {/* Agulha norte — dourada, aponta para cima */}
             <polygon points="20,5 22.5,20 20,17 17.5,20" fill="#F9A825" />
-            {/* Agulha sul — verde escuro */}
             <polygon points="20,35 17.5,20 20,23 22.5,20" fill="#1B5E20" />
             <circle cx="20" cy="20" r="2.5" fill="#F9A825" />
-            {/* Marcadores cardeais */}
             <text x="18.5" y="4" fill="#F9A825" fontSize="4" fontWeight="bold" fontFamily="sans-serif">N</text>
           </svg>
           <div>
@@ -169,7 +178,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </div>
       </div>
 
-      {/* Banner "continuar de onde parou" */}
+      {/* Banner continuar de onde parou */}
       {hasSavedProgress && isPaid && (
         <motion.div
           initial={{ y: -40, opacity: 0 }}
@@ -198,41 +207,32 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </motion.div>
       )}
 
-      {/* ─── RESULTADO BÁSICO (grátis) ─────────────────────────────────── */}
-
-      {/* Classificação */}
+      {/* Classificacao */}
       <div className="bg-white pt-3 pb-3 px-6">
         <BusinessClassBadge classification={classification} />
       </div>
 
-      {/* Frase de impacto */}
+      {/* Headline por nivel — PAS Problem */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="bg-white border-t border-gray-100 px-6 py-2"
+        className="bg-white border-t border-gray-100 px-6 py-3"
       >
-        <p className="text-center text-gray-700 text-sm leading-snug">
-          {result.lucroReal >= 0 ? (
-            <>Seu negócio está <span className="font-bold text-green-600">no positivo</span> — veja como proteger e ampliar esse resultado</>
-          ) : (
-            <>Seu negócio está com <span className="font-bold text-red-600">Prejuízo</span> — estimamos{' '}
-              <span className="font-bold text-red-600">{getLossRange(Math.abs(result.lucroReal))}/mês</span>
-            </>
-          )}
+        <p className="text-center text-gray-800 text-sm leading-snug font-semibold">
+          {getPasHeadline(classification.level)}
         </p>
       </motion.div>
 
-      {/* ═══ BLOCOS DE CONVERSÃO — apenas para não-pagantes ═══════════════ */}
+      {/* Blocos de conversao — apenas para nao-pagantes */}
       {!isPaid && (
         <>
-          {/* Separador visual */}
           <div
             className="mx-4 mt-2 h-px"
             style={{ background: 'linear-gradient(to right, transparent, #1B5E20 40%, #1B5E20 60%, transparent)' }}
           />
 
-          {/* 1. Bloco de transição + CTA primário */}
+          {/* 1. Achados personalizados + agitacao emocional */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -240,111 +240,77 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             className="mx-4 mt-4 rounded-2xl overflow-hidden"
             style={{ border: '2px solid #1B5E20' }}
           >
-            {/* Cabeçalho verde */}
             <div className="px-5 py-4" style={{ backgroundColor: '#1B5E20' }}>
-              <p className="text-white font-bold text-lg leading-snug mb-1">
-                O que está causando isso?
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" style={{ color: '#F9A825' }} />
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#F9A825' }}>
+                  Diagnóstico Personalizado
+                </span>
+              </div>
+              <p className="text-white font-bold text-lg leading-snug">
+                {margem <= 0
+                  ? 'Sua loja está operando no vermelho — cada dia assim aprofunda o buraco.'
+                  : `Sua margem é de ${margem.toFixed(1)}% — de cada R$1.000 que entra, só R$${porMil} fica com você.`}
               </p>
-              <p className="mt-1 text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
-                Descubra exatamente onde cortar gastos, quanto precisa vender por dia, e receba sua planilha pré-preenchida com seus dados.
-              </p>
+              {gapAnual > 1000 && (
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                  Se nada mudar nos próximos 12 meses, você vai deixar{' '}
+                  <span className="font-bold" style={{ color: '#F9A825' }}>
+                    R$ {gapAnual.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
+                  {' '}na mesa — dinheiro que poderia estar no seu bolso.
+                </p>
+              )}
             </div>
 
-            {/* Botão + ancoragem + trust signals + badge de urgência */}
-            <div className="bg-white px-5 py-4">
-              <a
-                href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={trackBeginCheckout}
-                className="flex items-center justify-center text-center w-full h-16 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-montserrat), sans-serif',
-                  boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
-                  borderRadius: '16px',
-                }}
-              >
-                {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
-                <ArrowRight className="w-5 h-5 flex-shrink-0" />
-              </a>
-
-              {/* Ancoragem de preço */}
-              <p className="mt-2 text-xs text-center text-gray-500">
-                {isPositive
-                  ? 'Menos que o custo de uma pizza pra proteger seu negócio.'
-                  : 'Menos do que 1 dia do prejuízo que você está tendo.'}
-              </p>
-
-              {/* Trust signals */}
-              <div className="mt-3 space-y-2">
-                <div className="flex items-start gap-2">
-                  <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
-                  <p className="text-xs text-gray-600 leading-snug">
-                    <span className="font-semibold">Garantia de 7 dias</span> — devolvemos cada centavo, sem perguntas.
-                  </p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
-                  <p className="text-xs text-gray-600 leading-snug">
-                    Lojistas que ajustam a precificação com dados reais aumentam a margem em média{' '}
-                    <span className="font-semibold" style={{ color: '#2E7D32' }}>8 a 15%</span>.
-                  </p>
-                </div>
+            {/* Preview borrada — cria curiosidade */}
+            <div className="bg-white relative overflow-hidden px-2 py-3">
+              <div className="blur-md opacity-60 pointer-events-none select-none p-2 space-y-1.5">
+                {[
+                  { label: 'Faturamento ideal', value: 'R$ 18.750' },
+                  { label: 'Meta de vendas por dia', value: 'R$ 412' },
+                  { label: 'Margem que você deveria ter', value: '22,4%' },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-gray-50 rounded-xl border border-gray-100 px-4 py-2 flex justify-between items-center">
+                    <p className="text-xs text-gray-400">{label}</p>
+                    <p className="text-base font-bold text-gray-800">{value}</p>
+                  </div>
+                ))}
               </div>
-
-              {/* Badge de urgência */}
               <div
-                className="mt-3 flex items-center justify-center rounded-xl py-2 px-4"
-                style={{ backgroundColor: '#FFFDE7', border: '1px solid #F9A825' }}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.9) 40%)' }}
               >
-                <span className="text-sm font-semibold text-center" style={{ color: '#E65100' }}>
-                  ⏰ Oferta de lançamento — preço sobe pra R$37 em breve
+                <span className="text-lg">🔒</span>
+                <span
+                  className="text-sm font-semibold bg-white/95 px-4 py-1.5 rounded-full shadow"
+                  style={{ color: '#1B5E20' }}
+                >
+                  Desbloqueie para ver seus números reais
                 </span>
               </div>
             </div>
           </motion.div>
 
-          {/* 2. Prévia borrada — cria curiosidade */}
+          {/* 2. Bridge emocional */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 }}
-            className="mx-4 mt-4 relative overflow-hidden rounded-2xl"
+            transition={{ delay: 1.05 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 px-5 py-4"
           >
-            <div className="blur-md opacity-60 pointer-events-none select-none p-4 space-y-2">
-              {[
-                { label: 'Seu faturamento ideal', value: 'R$ 18.750' },
-                { label: 'Break-even diário', value: 'R$ 412' },
-                { label: 'Margem que você deveria ter', value: '22,4%' },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-white rounded-xl border border-gray-100 p-4">
-                  <p className="text-xs text-gray-400 mb-1">{label}</p>
-                  <p className="text-xl font-bold text-gray-800">{value}</p>
-                </div>
-              ))}
-            </div>
-            <div
-              className="absolute inset-0 flex flex-col items-center justify-center gap-2"
-              style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(245,245,245,0.85) 40%)' }}
-            >
-              <span className="text-lg">🔒</span>
-              <span
-                className="text-sm font-semibold bg-white/95 px-4 py-2 rounded-full shadow"
-                style={{ color: '#1B5E20' }}
-              >
-                Desbloqueie para ver seus números reais
-              </span>
-            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              <span className="font-semibold text-gray-900">Mas esses números têm solução.</span>
+              {' '}Com as informações que você nos deu, já dá pra saber exatamente o que mudar — e quanto você vai recuperar.
+            </p>
           </motion.div>
 
           {/* 3. Prova social */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.15 }}
-            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5 space-y-3"
+            transition={{ delay: 1.1 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5 space-y-2"
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">👥</span>
@@ -352,26 +318,16 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 +300 lojistas já fizeram o diagnóstico
               </p>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">📊</span>
-              <p className="text-sm text-gray-600 leading-snug">
-                <span className="font-semibold text-gray-800">Dados do SEBRAE:</span> lojistas que conhecem suas margens reais têm{' '}
-                <span className="font-semibold" style={{ color: '#2E7D32' }}>3x mais chance</span> de sobreviver os primeiros 5 anos.
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
-              <p className="text-sm text-gray-600 leading-snug">
-                <span className="font-semibold text-gray-800">Garantia total de 7 dias</span> — se não gostar, devolvemos cada centavo sem perguntas.
-              </p>
-            </div>
+            <p className="text-sm text-gray-600 leading-snug pl-10">
+              Lojistas que entendem seus números fecham o mês com clareza — e tomam decisões sem depender de feeling.
+            </p>
           </motion.div>
 
-          {/* 5. O que vem no Trilha do Lucro */}
+          {/* 4. Deliverables como transformacoes */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 1.15 }}
             className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 p-5"
           >
             <h3
@@ -393,37 +349,59 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             </ul>
           </motion.div>
 
-          {/* 6. Segundo CTA */}
+          {/* 5. Garantia */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="mx-4 mt-4 rounded-2xl border border-gray-200 bg-white px-5 py-4 flex items-start gap-3"
+          >
+            <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#2E7D32' }} />
+            <p className="text-sm text-gray-700 leading-relaxed">
+              <span className="font-semibold text-gray-900">Teste por 7 dias.</span>
+              {' '}Se não estiver mais claro onde seu dinheiro está indo, manda uma mensagem — e te devolvemos os R$27 na hora. Sem formulário, sem justificativa.
+            </p>
+          </motion.div>
+
+          {/* 6. CTA principal */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.3 }}
-            className="px-4 mt-4"
+            transition={{ delay: 1.25 }}
+            className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 px-5 py-4"
           >
+            <p className="text-xs text-center text-gray-500 mb-3">
+              Consultoria financeira individual custa R$300+/hora. Isso é acesso permanente por R$27.
+            </p>
             <a
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackBeginCheckout}
               className="flex items-center justify-center text-center w-full h-16 rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform gap-2"
-              style={{
-                background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                color: '#FFFFFF',
-                fontFamily: 'var(--font-montserrat), sans-serif',
-                boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
-                borderRadius: '16px',
-              }}
+              style={ctaStyle}
             >
-              {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
+              {ctaLabel}
               <ArrowRight className="w-5 h-5 flex-shrink-0" />
             </a>
+            <p className="mt-2 text-xs text-center text-gray-400">
+              Acesso imediato · Garantia 7 dias
+            </p>
+            <div
+              className="mt-3 flex items-center justify-center rounded-xl py-2 px-4"
+              style={{ backgroundColor: '#FFFDE7', border: '1px solid #F9A825' }}
+            >
+              <span className="text-sm font-semibold text-center" style={{ color: '#E65100' }}>
+                Oferta de lançamento — preço sobe pra R$37 em breve
+              </span>
+            </div>
           </motion.div>
 
           {/* 7. FAQ */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.4 }}
+            transition={{ delay: 1.3 }}
             className="mx-4 mt-4 bg-white rounded-2xl border border-gray-100 overflow-hidden"
           >
             {[
@@ -462,37 +440,25 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             ))}
           </motion.div>
 
-          {/* 8. Bloco de urgência "DIAGNÓSTICO PERSONALIZADO" */}
+          {/* 8. Urgencia final + CTA */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
+            transition={{ delay: 1.4 }}
             className="mx-4 mt-4 rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
           >
             <div className="px-6 pt-6 pb-5" style={{ backgroundColor: '#1B5E20' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-5 h-5 flex-shrink-0" style={{ color: '#F9A825' }} />
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#F9A825' }}>
-                  Diagnóstico Personalizado
-                </span>
-              </div>
-              <h2
+              <p
                 className="text-xl font-bold text-white leading-tight mb-2"
                 style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
               >
                 {margem <= 0
-                  ? 'Sua loja está operando no vermelho — cada dia assim aprofunda o buraco.'
-                  : `Sua margem é de ${margem.toFixed(1)}% — de cada R$\u00A01.000 que entra, só R$\u00A0${porMil} fica com você.`}
-              </h2>
-              {gapAnual > 1000 && (
-                <p className="text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
-                  Se nada mudar nos próximos 12 meses, você vai deixar aproximadamente{' '}
-                  <span className="font-bold" style={{ color: '#F9A825' }}>
-                    R$&nbsp;{gapAnual.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  </span>{' '}
-                  na mesa — dinheiro que poderia estar no seu bolso.
-                </p>
-              )}
+                  ? 'Amanhã sua loja abre. Você vai vender. Mas sem mudança, cada R$1.000 que entrar vai aprofundar o buraco.'
+                  : `Amanhã sua loja abre. Você vai vender. Mas se nada mudar, de cada R$1.000 que entrar, só R$${porMil} fica com você.`}
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: '#A5D6A7' }}>
+                Você já tem o diagnóstico. Agora é só decidir o que fazer com ele.
+              </p>
             </div>
             <div className="bg-white px-6 py-5 space-y-3">
               <a
@@ -501,17 +467,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
                 rel="noopener noreferrer"
                 onClick={trackBeginCheckout}
                 className="w-full py-4 rounded-2xl font-bold text-base active:scale-[0.98] transition-transform flex items-center justify-center text-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-montserrat), sans-serif',
-                  boxShadow: '0 6px 24px rgba(249, 115, 22, 0.55)',
-                  borderRadius: '16px',
-                }}
+                style={ctaStyle}
               >
-                {isPositive ? 'Ver meu plano pra aumentar o lucro — R$27' : 'Ver meu plano pra sair do prejuízo — R$27'}
+                {ctaLabel}
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </a>
+              <p className="text-xs text-center text-gray-400">Acesso imediato · Garantia 7 dias</p>
               <button
                 type="button"
                 onClick={() => window.open('https://app.hotmart.com/products/purchased', '_blank')}
@@ -525,10 +486,9 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </>
       )}
 
-      {/* ═══ CONTEÚDO PAGO ═══════════════════════════════════════════════ */}
+      {/* Conteudo pago */}
       {isPaid && (
         <div className="mt-4">
-          {/* Métricas detalhadas */}
           <div className="px-4 space-y-3">
             <MetricCard
               label="Quanto sobra de verdade"
@@ -564,12 +524,10 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             />
           </div>
 
-          {/* Insights / Recomendações */}
           <div className="px-4 mt-6">
             <InsightsPanel insights={insights} />
           </div>
 
-          {/* Materiais para download */}
           <div className="px-4 mt-6">
             <DeliverableButtons
               input={input}
@@ -581,14 +539,12 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
             />
           </div>
 
-          {/* Checklist 30/60/90 */}
           {showChecklist && (
             <div className="px-4 mt-4">
               <ActionChecklist level={classification.level} />
             </div>
           )}
 
-          {/* Resultado da estratégia gerada */}
           {paidStep === 'strategy' && (strategy || purposeAnswers.q1) && (
             <StrategyResult
               strategy={strategy ?? generateStrategy(purposeAnswers)}
@@ -600,7 +556,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
         </div>
       )}
 
-      {/* Botão refazer — sempre visível */}
+      {/* Botao refazer — sempre visivel */}
       <div className="px-4 mt-8">
         <Button
           type="button"
@@ -617,7 +573,7 @@ export function ResultsDashboard({ input, result, classification, insights, onRe
   );
 }
 
-// ─── StrategyResult ──────────────────────────────────────────────────────────
+// StrategyResult
 
 interface StrategyResultProps {
   strategy: GeneratedStrategy;
@@ -649,7 +605,6 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
         </button>
       </div>
 
-      {/* Propósito, Missão, Visão */}
       {[
         { label: 'Propósito', text: strategy.purpose, color: 'border-l-green-600' },
         { label: 'Missão', text: strategy.mission, color: 'border-l-green-500' },
@@ -661,7 +616,6 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
         </div>
       ))}
 
-      {/* Valores */}
       {strategy.values.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 p-4 border-l-4 border-l-amber-500">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Valores</p>
@@ -675,10 +629,8 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
         </div>
       )}
 
-      {/* SWOT resumida */}
       <SwotSummary answers={swotAnswers} />
 
-      {/* Top cruzamentos */}
       {topCrossings.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 p-4">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">
@@ -709,7 +661,7 @@ function StrategyResult({ strategy, swotAnswers, swotCrossing, onRedo }: Strateg
   );
 }
 
-// ─── SwotSummary ─────────────────────────────────────────────────────────────
+// SwotSummary
 
 interface SwotSummaryProps {
   answers: SwotAnswers;
